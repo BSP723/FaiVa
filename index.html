@@ -40,7 +40,6 @@ body {
 }
 .container { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
 
-/* Header */
 .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 24px; }
 .logo { display: flex; align-items: center; gap: 10px; }
 .logo-icon {
@@ -57,7 +56,6 @@ body {
   border-radius: 20px; letter-spacing: 0.5px;
 }
 
-/* Screens */
 .screen { display: none; }
 .screen.active { display: block; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
@@ -66,75 +64,24 @@ body {
 .connect-screen { text-align: center; padding-top: 40px; }
 .connect-screen h2 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
 .connect-screen p { color: var(--text-dim); font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+.connect-input-wrap {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 4px; margin-bottom: 12px; display: flex; align-items: center;
+}
+.connect-input-wrap input {
+  flex: 1; background: none; border: none; padding: 14px 12px;
+  color: var(--text); font-size: 14px; font-family: monospace;
+  outline: none;
+}
+.connect-input-wrap input::placeholder { color: var(--text-dim); }
+.connect-input-wrap button {
+  background: var(--accent); border: none; color: white;
+  padding: 12px 20px; border-radius: 10px; font-weight: 600;
+  font-size: 14px; cursor: pointer; white-space: nowrap;
+}
+.connect-input-wrap button:disabled { opacity: 0.5; cursor: not-allowed; }
+.connect-hint { font-size: 12px; color: var(--text-dim); margin-top: 8px; line-height: 1.5; }
 
-/* Connect button */
-.connect-btn {
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  width: 100%; padding: 16px 20px; border: none; border-radius: var(--radius);
-  background: var(--surface); border: 1px solid var(--border);
-  color: var(--text); font-size: 16px; font-weight: 700; font-family: inherit;
-  cursor: pointer; transition: all 0.2s;
-}
-.connect-btn:hover { border-color: var(--accent); background: var(--surface2); }
-.connect-btn:active { transform: scale(0.98); }
-.connect-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.connect-btn .icon { font-size: 24px; }
-
-.connect-hint { font-size: 12px; color: var(--text-dim); margin-top: 16px; line-height: 1.5; }
-.connect-hint a { color: var(--accent); text-decoration: none; }
-
-/* QR Modal */
-.qr-overlay {
-  display: none; position: fixed; inset: 0; z-index: 1000;
-  background: rgba(0,0,0,0.8); backdrop-filter: blur(12px);
-  align-items: center; justify-content: center;
-}
-.qr-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
-.qr-modal {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; padding: 32px 24px; max-width: 380px;
-  width: 90%; text-align: center;
-}
-.qr-modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-.qr-modal p { font-size: 13px; color: var(--text-dim); margin-bottom: 16px; line-height: 1.5; }
-.qr-canvas-wrap {
-  background: white; border-radius: 16px; padding: 16px;
-  display: inline-block; margin-bottom: 20px;
-}
-.qr-close {
-  background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text); padding: 10px 24px; border-radius: 10px;
-  font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit;
-}
-.qr-close:hover { background: var(--border); }
-.qr-status { font-size: 12px; color: var(--text-dim); margin-top: 12px; }
-
-/* Loading */
-.loading-screen { text-align: center; padding: 60px 20px; }
-.loading-screen .spinner-lg {
-  width: 40px; height: 40px; border: 3px solid var(--border);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
-}
-
-/* Error / Status */
-.error-banner {
-  display: none; background: var(--red-bg); border: 1px solid rgba(239,68,68,0.2);
-  color: var(--red); padding: 12px 16px; border-radius: 10px;
-  font-size: 13px; margin-bottom: 16px; line-height: 1.5;
-}
-.error-banner.show { display: block; animation: fadeIn 0.3s ease; }
-.toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text); padding: 12px 20px; border-radius: 12px;
-  font-size: 13px; font-weight: 500; z-index: 999;
-  opacity: 0; transition: opacity 0.3s; pointer-events: none;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-}
-.toast.show { opacity: 1; }
-
-/* Cards */
 .card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
@@ -144,7 +91,6 @@ body {
   text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;
 }
 
-/* Form Elements */
 .form-group { margin-bottom: 20px; }
 .form-label {
   display: block; font-size: 13px; font-weight: 600;
@@ -159,7 +105,6 @@ body {
 .form-input:focus { border-color: var(--accent); }
 .form-input::placeholder { color: var(--text-dim); }
 
-/* Slider */
 .slider-wrap { padding: 8px 0; }
 .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .slider-value {
@@ -181,7 +126,6 @@ input[type="range"]::-moz-range-thumb {
   border: none; border-radius: 50%; cursor: pointer;
 }
 
-/* Calendar */
 .calendar-input { position: relative; }
 .calendar-input .form-input { padding-right: 44px; }
 .calendar-icon {
@@ -189,10 +133,8 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: none; opacity: 0.5;
 }
 
-/* Summary */
 .loan-summary {
-  background: var(--surface2); border-radius: 10px; padding: 16px;
-  margin-top: 16px;
+  background: var(--surface2); border-radius: 10px; padding: 16px; margin-top: 16px;
 }
 .summary-row {
   display: flex; justify-content: space-between; align-items: center;
@@ -203,7 +145,6 @@ input[type="range"]::-moz-range-thumb {
 .summary-row .value { font-weight: 600; font-variant-numeric: tabular-nums; }
 .summary-row.total .value { color: var(--accent); font-size: 16px; font-weight: 700; }
 
-/* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 14px 20px; border: none; border-radius: 12px;
@@ -212,20 +153,15 @@ input[type="range"]::-moz-range-thumb {
 }
 .btn-primary {
   background: linear-gradient(135deg, var(--accent), #6d4de8);
-  color: white;
-  box-shadow: 0 4px 16px var(--accent-glow);
+  color: white; box-shadow: 0 4px 16px var(--accent-glow);
 }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 .btn-primary:not(:disabled):active { transform: scale(0.98); }
-.btn-secondary {
-  background: var(--surface2); color: var(--text);
-  border: 1px solid var(--border);
-}
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
 .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; }
 .btn-green { background: var(--green); color: #000; }
 .btn-green:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* Tabs */
 .tabs {
   display: flex; gap: 4px; background: var(--surface);
   border: 1px solid var(--border); border-radius: 12px;
@@ -239,7 +175,6 @@ input[type="range"]::-moz-range-thumb {
 }
 .tab.active { background: var(--accent); color: white; }
 
-/* Loan Items */
 .loan-item {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
@@ -252,7 +187,6 @@ input[type="range"]::-moz-range-thumb {
 .loan-item-actions { display: flex; gap: 8px; margin-top: 12px; }
 .loan-item-actions .btn { flex: 1; }
 
-/* Status badges */
 .badge {
   display: inline-block; font-size: 11px; font-weight: 600;
   padding: 4px 10px; border-radius: 20px; letter-spacing: 0.3px;
@@ -262,7 +196,6 @@ input[type="range"]::-moz-range-thumb {
 .badge-repaid { background: var(--surface2); color: var(--text-dim); }
 .badge-overdue { background: var(--red-bg); color: var(--red); }
 
-/* Reminder */
 .reminder-card {
   background: var(--amber-bg); border: 1px solid rgba(245,158,11,0.2);
   border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
@@ -270,14 +203,10 @@ input[type="range"]::-moz-range-thumb {
 .reminder-card .reminder-text { font-size: 13px; line-height: 1.5; color: var(--amber); }
 .reminder-card .reminder-actions { display: flex; gap: 8px; margin-top: 12px; }
 
-/* Empty state */
-.empty-state {
-  text-align: center; padding: 48px 20px; color: var(--text-dim);
-}
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-dim); }
 .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
 .empty-state p { font-size: 14px; }
 
-/* Nav bar */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--surface); border-top: 1px solid var(--border);
@@ -293,7 +222,6 @@ input[type="range"]::-moz-range-thumb {
 .nav-btn.active { color: var(--accent); }
 .nav-btn .nav-icon { font-size: 20px; }
 
-/* Wallet bar */
 .wallet-bar {
   display: flex; align-items: center; gap: 8px;
   background: var(--surface); border: 1px solid var(--border);
@@ -309,7 +237,6 @@ input[type="range"]::-moz-range-thumb {
 }
 .wallet-disconnect:hover { opacity: 1; }
 
-/* Spinner */
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner {
   width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
@@ -317,7 +244,30 @@ input[type="range"]::-moz-range-thumb {
   animation: spin 0.6s linear infinite; display: inline-block;
 }
 
-/* Accept loan screen */
+.error-banner {
+  display: none; background: var(--red-bg); border: 1px solid rgba(239,68,68,0.2);
+  color: var(--red); padding: 12px 16px; border-radius: 10px;
+  font-size: 13px; margin-bottom: 16px; line-height: 1.5;
+}
+.error-banner.show { display: block; animation: fadeIn 0.3s ease; }
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); padding: 12px 20px; border-radius: 12px;
+  font-size: 13px; font-weight: 500; z-index: 999;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.show { opacity: 1; }
+
+/* Sign URL box */
+.sign-url-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px; margin: 16px 0;
+  word-break: break-all; font-size: 12px; font-family: monospace;
+  color: var(--accent); max-height: 120px; overflow-y: auto;
+}
+
 .accept-loan { text-align: center; padding: 20px 0; }
 .accept-loan .loan-detail-card { text-align: left; }
 .accept-loan .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -325,6 +275,21 @@ input[type="range"]::-moz-range-thumb {
 .accept-loan .detail-label { color: var(--text-dim); }
 .accept-loan .detail-value { font-weight: 600; }
 .accept-loan .detail-value.big { font-size: 22px; font-weight: 700; color: var(--accent); }
+
+/* Steps */
+.steps {
+  display: flex; gap: 12px; margin: 16px 0;
+}
+.step {
+  flex: 1; text-align: center; padding: 16px 8px;
+  background: var(--surface2); border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.step-num {
+  font-size: 20px; font-weight: 800; color: var(--accent);
+  margin-bottom: 4px;
+}
+.step-text { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
 
 @media (min-width: 500px) {
   .container { max-width: 520px; }
@@ -341,36 +306,30 @@ input[type="range"]::-moz-range-thumb {
     </div>
     <div class="header-badge">BSP GATED</div>
   </div>
+
   <div id="error-banner" class="error-banner"></div>
 
-  <!-- Loading Screen -->
-  <div id="screen-loading" class="screen active">
-    <div class="loading-screen">
-      <div class="spinner-lg"></div>
-      <p style="color:var(--text-dim)">Loading FaiVa...</p>
-    </div>
-  </div>
-
   <!-- Connect Screen -->
-  <div id="screen-connect" class="screen">
+  <div id="screen-connect" class="screen active">
     <div class="connect-screen">
       <h2>Connect your wallet</h2>
-      <p>Scan the QR code with Joey Wallet on your phone. No seed needed — just scan and go.</p>
-      <button class="connect-btn" id="connect-btn" onclick="connectWallet()">
-        <span class="icon">🦘</span> Connect via Joey Wallet
-      </button>
-      <div class="connect-hint">Don't have Joey? <a href="https://joeywallet.xyz" target="_blank">Download free</a> — sign in with Google in 5 seconds.</div>
+      <p>Enter your XRPL address to check your BSP balance. When sending or repaying, you'll sign in your wallet app.</p>
+      <div class="connect-input-wrap">
+        <input type="text" id="address-input" placeholder="rYourXRPLAddress..." autocomplete="off" spellcheck="false">
+        <button id="connect-btn" onclick="connectWallet()">Connect</button>
+      </div>
+      <div class="connect-hint">Your address is never sent anywhere — it's only used to query the XRPL ledger.</div>
     </div>
   </div>
 
-  <!-- Accept Loan -->
+  <!-- Accept Loan Screen -->
   <div id="screen-accept" class="screen">
-    <div class="accept-loan" id="accept-content" style="text-align:center;">
+    <div class="accept-loan" id="accept-content">
       <p style="color:var(--text-dim);margin-bottom:24px;">Loading loan details...</p>
     </div>
   </div>
 
-  <!-- Create Loan -->
+  <!-- Create Loan Screen -->
   <div id="screen-create" class="screen">
     <div id="wallet-bar" class="wallet-bar" style="display:none;">
       <div class="wallet-dot"></div>
@@ -378,6 +337,7 @@ input[type="range"]::-moz-range-thumb {
       <span class="wallet-bsp" id="wallet-bsp"></span>
       <button class="wallet-disconnect" onclick="disconnectWallet()" title="Disconnect">✕</button>
     </div>
+
     <div class="card">
       <div class="card-title">Create a Loan</div>
       <div class="form-group">
@@ -422,10 +382,12 @@ input[type="range"]::-moz-range-thumb {
         <div class="summary-row total"><span class="label">Friend repays</span><span class="value" id="summary-total">—</span></div>
       </div>
     </div>
-    <button class="btn btn-primary" id="create-btn" onclick="createLoan()" disabled>Create & Send Loan</button>
+    <button class="btn btn-primary" id="create-btn" onclick="createLoan()" disabled>
+      Create Payment URL
+    </button>
   </div>
 
-  <!-- My Loans -->
+  <!-- My Loans Screen -->
   <div id="screen-loans" class="screen">
     <div class="tabs">
       <button class="tab active" data-tab="active" onclick="switchTab('active')">Active</button>
@@ -435,7 +397,7 @@ input[type="range"]::-moz-range-thumb {
     <div id="loans-list"></div>
   </div>
 
-  <!-- Reminders -->
+  <!-- Reminders Screen -->
   <div id="screen-reminders" class="screen">
     <div id="reminders-list"></div>
   </div>
@@ -449,51 +411,15 @@ input[type="range"]::-moz-range-thumb {
 
 <div id="toast" class="toast"></div>
 
-<!-- QR Overlay -->
-<div class="qr-overlay" id="qr-overlay">
-  <div class="qr-modal">
-    <h3>Scan with Joey Wallet</h3>
-    <p>Open Joey Wallet on your phone and scan this QR code.</p>
-    <div class="qr-canvas-wrap"><canvas id="qr-canvas" width="240" height="240"></canvas></div>
-    <div class="qr-status" id="qr-status">Waiting for you to scan...</div>
-    <br><br>
-    <button class="qr-close" onclick="closeQR()">Cancel</button>
-  </div>
-</div>
-
-<script src="https://esm.sh/@walletconnect/universal-provider@2.17.0?bundle&target=es2020" type="module" async></script>
-<script src="https://esm.sh/qrcode@1.5.4?bundle&target=es2020" type="module" async></script>
-
-<script type="module">
+<script>
 // ---- Configuration ----
 const XRPL_RPC = 'https://rpc.xrplclaw.com'
 const BSP_ISSUER = 'rG47hi9xKvEhjCD8LXhfxjRzuEEBxwGUbL'
 const RLUSD_ISSUER = 'rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De'
 const RLUSD_CURRENCY = '524C555344000000000000000000000000000000'
-const WC_PROJECT_ID = '7011b636254f3ae563decfce6021cd7f'
 
-// ---- State ----
 let wallet = null
 let currentTab = 'active'
-let wcProvider = null
-let UniversalProviderModule = null
-let QRCodeModule = null
-let qrModuleLoaded = false
-
-// ---- Environment ----
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-
-// ---- Expose globals ----
-window.connectWallet = connectWallet
-window.disconnectWallet = disconnectWallet
-window.showScreen = showScreen
-window.switchTab = switchTab
-window.updateSummary = updateSummary
-window.setDueDate = setDueDate
-window.createLoan = createLoan
-window.repayLoan = repayLoan
-window.acceptLocalLoan = acceptLocalLoan
-window.closeQR = closeQR
 
 // ---- XRPL RPC ----
 async function xrpl(method, params) {
@@ -505,20 +431,6 @@ async function xrpl(method, params) {
   const data = await res.json()
   if (data.error) throw new Error(data.error_message || data.error)
   return data.result
-}
-
-// ---- Autofill ----
-async function getAutofillFields(account) {
-  const [acctRes, feeRes, ledgerRes] = await Promise.all([
-    xrpl('account_info', { account, ledger_index: 'current' }),
-    xrpl('fee'),
-    xrpl('ledger_current')
-  ])
-  return {
-    Sequence: acctRes.account_data.Sequence,
-    Fee: String(Math.max(Number(feeRes.drops.open_ledger_fee || '12'), 12)),
-    LastLedgerSequence: ledgerRes.ledger_current_index + 20
-  }
 }
 
 // ---- Toast ----
@@ -570,129 +482,32 @@ function generateLoanCode() {
   return code
 }
 
-// ---- QR ----
-function closeQR() {
-  document.getElementById('qr-overlay').classList.remove('show')
-}
-
-function renderQR(uri) {
-  const canvas = document.getElementById('qr-canvas')
-  if (QRCodeModule) {
-    QRCodeModule.default.toCanvas(canvas, uri, {
-      width: 240, margin: 2,
-      color: { dark: '#0a0a0f', light: '#ffffff' }
-    }, (err) => { if (err) console.error('QR error:', err) })
-  } else {
-    // Fallback: simple text-based QR display
-    console.log('QR URI:', uri)
-    canvas.parentElement.innerHTML = `<p style="color:var(--text);font-size:12px;word-break:break-all;">${uri}</p>`
-  }
-}
-
-// ---- Extract Address ----
-function extractAddress(session) {
-  for (const key of Object.keys(session?.namespaces ?? {})) {
-    const accs = session.namespaces[key]?.accounts
-    if (accs?.length) return accs[0].split(':').pop()
-  }
-  return null
-}
-
-// ---- Connect Wallet ----
+// ---- Connect Wallet (address only) ----
 async function connectWallet() {
+  const address = document.getElementById('address-input').value.trim()
+  if (!address || !address.startsWith('r') || address.length < 25) {
+    showError('Please enter a valid XRPL address (starts with r).')
+    return
+  }
+
   const btn = document.getElementById('connect-btn')
   btn.disabled = true
-  btn.innerHTML = '<span class="spinner"></span> Initializing...'
+  btn.innerHTML = '<span class="spinner"></span>'
 
   try {
-    // Wait for bundled modules to load
-    if (!UniversalProviderModule) {
-      btn.innerHTML = '<span class="spinner"></span> Loading WalletConnect...'
-      UniversalProviderModule = await import('https://esm.sh/@walletconnect/universal-provider@2.17.0?bundle&target=es2020')
-      QRCodeModule = await import('https://esm.sh/qrcode@1.5.4?bundle&target=es2020')
-    }
-
-    const UniversalProvider = UniversalProviderModule.default
-    const QRCode = QRCodeModule.default
-
-    // Check for existing session
-    if (wcProvider?.session) {
-      const addr = extractAddress(wcProvider.session)
-      if (addr) { await onWalletConnected(addr); return }
-    }
-
-    wcProvider = await UniversalProvider.init({
-      projectId: WC_PROJECT_ID,
-      metadata: {
-        name: 'FaiVa',
-        description: 'Friend-to-friend RLUSD lending',
-        url: window.location.origin,
-        icons: []
-      }
-    })
-
-    // Check existing session after init
-    if (wcProvider.session) {
-      const addr = extractAddress(wcProvider.session)
-      if (addr) { await onWalletConnected(addr); return }
-    }
-
-    // Register session handlers
-    wcProvider.on('connect', ({ session }) => {
-      const addr = extractAddress(session)
-      if (addr) onWalletConnected(addr)
-    })
-
-    wcProvider.on('disconnect', () => {
-      if (wallet) { toast('Wallet disconnected'); disconnectWallet() }
-    })
-
-    btn.innerHTML = '<span class="spinner"></span> Generating QR...'
-
-    // Create pairing manually to get URI
-    const { uri, pairingTopic } = await wcProvider.client.core.pairing.create()
-
-    // Show QR immediately
-    renderQR(uri)
-    document.getElementById('qr-overlay').classList.add('show')
-    document.getElementById('qr-status').textContent = 'Waiting for you to scan...'
-
-    // Connect using the pairing
-    await wcProvider.connect({
-      pairingTopic,
-      namespaces: {
-        xrpl: {
-          methods: ['xrpl_signTransaction'],
-          chains: ['xrpl:0'],
-          events: ['chainChanged', 'accountsChanged']
-        }
-      }
-    })
-
-  } catch (err) {
-    console.error('[Connect] Error:', err)
-    showError('Failed to connect: ' + err.message)
-    btn.disabled = false
-    btn.innerHTML = '<span class="icon">🦘</span> Connect via Joey Wallet'
-  }
-}
-
-// ---- On Wallet Connected ----
-async function onWalletConnected(address) {
-  try {
-    closeQR()
-    document.getElementById('qr-overlay').classList.remove('show')
-
     const lines = await xrpl('account_lines', { account: address, ledger_index: 'validated' })
     const bspLine = lines.lines?.find(l => l.currency === 'BSP' && l.account === BSP_ISSUER)
-    const bspBal = bspLine ? parseFloat(bspLine.balance) : 0
+    const bspBal = bspLine ? Math.abs(parseFloat(bspLine.balance)) : 0
 
     if (bspBal <= 0) {
-      showError('You need to hold BSP tokens to access FaiVa.')
+      showError('This wallet does not hold any BSP tokens. Get some BSP to access FaiVa.')
+      btn.disabled = false
+      btn.textContent = 'Connect'
       return
     }
 
     wallet = { address, bspBalance: bspBal }
+
     document.getElementById('wallet-bar').style.display = 'flex'
     document.getElementById('wallet-addr').textContent = address.slice(0, 8) + '...' + address.slice(-6)
     document.getElementById('wallet-bsp').textContent = bspBal.toFixed(2) + ' BSP'
@@ -710,18 +525,41 @@ async function onWalletConnected(address) {
     document.getElementById('bottom-nav').style.display = 'flex'
     toast('Connected! BSP: ' + bspBal.toFixed(2))
   } catch (err) {
-    showError('Failed to verify wallet: ' + err.message)
+    showError('Failed to connect: ' + err.message)
   }
+
+  btn.disabled = false
+  btn.textContent = 'Connect'
 }
 
-// ---- Disconnect ----
 function disconnectWallet() {
   wallet = null
-  if (wcProvider) { wcProvider.disconnect().catch(() => {}); wcProvider = null }
   document.getElementById('wallet-bar').style.display = 'none'
   document.getElementById('bottom-nav').style.display = 'none'
   showScreen('connect')
   toast('Disconnected')
+}
+
+// ---- Generate Xaman Payment URL ----
+function buildPaymentUrl(senderAddr, recipientAddr, amount, memoData) {
+  // Build the XRPL Payment transaction JSON
+  const tx = {
+    TransactionType: 'Payment',
+    Account: senderAddr,
+    Destination: recipientAddr,
+    Amount: {
+      currency: RLUSD_CURRENCY,
+      value: amount,
+      issuer: RLUSD_ISSUER
+    },
+    Memos: [{ Memo: { MemoData: btoa(memoData) } }]
+  }
+
+  // Encode as base64 for Xaman URL
+  const txB64 = btoa(JSON.stringify(tx))
+
+  // Xaman web URL
+  return 'https://xumm.app/detect/sign?tx=' + txB64
 }
 
 // ---- Summary ----
@@ -752,7 +590,7 @@ function setDueDate(days) {
 }
 
 // ---- Create Loan ----
-async function createLoan() {
+function createLoan() {
   if (!wallet) return
   const borrower = document.getElementById('borrower-input').value.trim()
   const amount = parseFloat(document.getElementById('amount-input').value)
@@ -763,82 +601,61 @@ async function createLoan() {
   if (!amount || amount <= 0) { showError('Enter a valid amount.'); return }
   if (!due) { showError('Select a date.'); return }
 
-  const btn = document.getElementById('create-btn')
-  btn.disabled = true
-  btn.innerHTML = '<span class="spinner"></span> Preparing...'
+  const feeAmt = (amount * fee / 100).toFixed(2)
+  const totalRepay = (amount + parseFloat(feeAmt)).toFixed(2)
+  const loanCode = generateLoanCode()
 
-  try {
-    const feeAmt = (amount * fee / 100).toFixed(2)
-    const totalRepay = (amount + parseFloat(feeAmt)).toFixed(2)
-    const loanCode = generateLoanCode()
+  const memoData = JSON.stringify({
+    type: 'faiva_loan', code: loanCode, lender: wallet.address,
+    borrower, amount: amount.toFixed(2), feePercent: fee,
+    feeAmount: feeAmt, totalRepay, dueDate: due
+  })
 
-    const autofill = await getAutofillFields(wallet.address)
-    const tx = {
-      TransactionType: 'Payment',
-      Account: wallet.address,
-      Destination: borrower,
-      Amount: { currency: RLUSD_CURRENCY, value: amount.toFixed(2), issuer: RLUSD_ISSUER },
-      Fee: autofill.Fee,
-      Sequence: autofill.Sequence,
-      LastLedgerSequence: autofill.LastLedgerSequence,
-      Flags: 0,
-      Memos: [{ Memo: { MemoData: btoa(JSON.stringify({
-        type: 'faiva_loan', code: loanCode, lender: wallet.address,
-        borrower, amount: amount.toFixed(2), feePercent: fee,
-        feeAmount: feeAmt, totalRepay, dueDate: due
-      }))} }]
-    }
+  const signUrl = buildPaymentUrl(wallet.address, borrower, amount.toFixed(2), memoData)
 
-    btn.innerHTML = '<span class="spinner"></span> Requesting signature...'
+  addLoan({
+    code: loanCode, lenderAddress: wallet.address, borrowerAddress: borrower,
+    amount: amount.toFixed(2), feePercent: fee, feeAmount: feeAmt,
+    totalRepay, dueDate: due, createdAt: new Date().toISOString(),
+    status: 'sent', signUrl,
+    acceptUrl: window.location.origin + window.location.pathname + '?loan=' + loanCode
+  })
 
-    const signResult = await wcProvider.request({
-      method: 'xrpl_signTransaction',
-      params: { tx_blob: null, tx_json: tx }
-    }, 'xrpl:0')
+  toast('Payment URL generated!')
 
-    addLoan({
-      code: loanCode, lenderAddress: wallet.address, borrowerAddress: borrower,
-      amount: amount.toFixed(2), feePercent: fee, feeAmount: feeAmt,
-      totalRepay, dueDate: due, createdAt: new Date().toISOString(),
-      status: 'sent', txHash: signResult?.tx_hash || '',
-      acceptUrl: window.location.origin + window.location.pathname + '?loan=' + loanCode
-    })
+  // Show the payment URL
+  const shareEl = document.createElement('div')
+  shareEl.className = 'card'
+  shareEl.id = 'sign-url-card'
+  shareEl.innerHTML = `
+    <div class="card-title">Payment Ready ✅</div>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.5;">
+      To send <strong>${amount.toFixed(2)} RLUSD</strong> to your friend, sign this payment in your wallet:
+    </p>
+    <a href="${signUrl}" target="_blank" class="btn btn-green" style="margin-bottom:12px;text-decoration:none;">
+      🔐 Open in Xaman to Sign
+    </a>
+    <p style="font-size:12px;color:var(--text-dim);margin:12px 0;">Or copy this URL and open it in any XRPL wallet app:</p>
+    <div class="sign-url-box">${signUrl}</div>
+    <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:8px;" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent.trim());toast('URL copied!')">📋 Copy URL</button>
 
-    toast('Loan sent! Code: ' + loanCode)
-    document.getElementById('borrower-input').value = ''
-    document.getElementById('amount-input').value = ''
-    document.getElementById('due-date-input').value = ''
-    document.getElementById('fee-slider').value = 5
-    updateSummary()
-    showLoanShare(loanCode, window.location.origin + window.location.pathname + '?loan=' + loanCode, borrower, totalRepay)
-  } catch (err) {
-    const msg = err.message || 'Unknown error'
-    if (/rejected|denied|cancelled/i.test(msg)) {
-      showError('You declined the signing request.')
-    } else {
-      showError('Failed: ' + msg)
-    }
-  }
-  btn.disabled = false
-  btn.textContent = 'Create & Send Loan'
-}
-
-function showLoanShare(code, url, borrower, totalRepay) {
-  const el = document.createElement('div')
-  el.className = 'card'; el.id = 'share-info'
-  el.innerHTML = `
-    <div class="card-title">Loan Created ✅</div>
-    <div class="loan-summary">
-      <div class="summary-row"><span class="label">Code</span><span class="value">${code}</span></div>
-      <div class="summary-row"><span class="label">To</span><span class="value">${borrower.slice(0,8)}...${borrower.slice(-6)}</span></div>
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:8px;">Share this link so your friend can accept:</p>
+      <div class="sign-url-box" style="color:var(--green);">${window.location.origin + window.location.pathname}?loan=${loanCode}</div>
+      <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:8px;" onclick="navigator.clipboard.writeText('${window.location.origin + window.location.pathname}?loan=${loanCode}');toast('Link copied!')">📋 Copy Accept Link</button>
     </div>
-    <p style="font-size:13px;color:var(--text-dim);margin:12px 0;">Share this link:</p>
-    <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:12px;font-family:monospace;word-break:break-all;margin-bottom:12px;color:var(--accent);">${url}</div>
-    <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:8px;" onclick="navigator.clipboard.writeText('${url}');toast('Copied!')">📋 Copy Link</button>
   `
-  const existing = document.getElementById('share-info')
+
+  const existing = document.getElementById('sign-url-card')
   if (existing) existing.remove()
-  document.getElementById('screen-create').insertBefore(el, document.getElementById('create-btn'))
+  document.getElementById('screen-create').insertBefore(shareEl, document.getElementById('create-btn'))
+
+  // Reset form
+  document.getElementById('borrower-input').value = ''
+  document.getElementById('amount-input').value = ''
+  document.getElementById('due-date-input').value = ''
+  document.getElementById('fee-slider').value = 5
+  updateSummary()
 }
 
 // ---- Accept Loan ----
@@ -846,9 +663,11 @@ async function showAcceptScreen(loanCode) {
   const loans = getLoans()
   const local = loans.find(l => l.code === loanCode)
   const content = document.getElementById('accept-content')
+
   if (local && local.borrowerAddress === wallet.address) {
     renderAccept(content, local); return
   }
+
   try {
     const txData = await xrpl('account_tx', {
       account: wallet.address, ledger_index_min: -1, ledger_index_max: -1, limit: 50, forward: false
@@ -895,16 +714,58 @@ function renderAccept(container, loan) {
       <div class="detail-row"><span class="detail-label">Repay</span><span class="detail-value big">${loan.totalRepay} RLUSD</span></div>
       <div class="detail-row"><span class="detail-label">Due</span><span class="detail-value">${new Date(loan.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span></div>
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="badge badge-${loan.status}">${loan.status.toUpperCase()}</span></span></div>
-      ${loan.status === 'sent' ? `<div style="margin-top:20px;"><button class="btn btn-green" onclick="acceptLocalLoan('${loan.code}')">✅ Accept</button></div>` : ''}
+      ${loan.status === 'sent' ? `<div style="margin-top:20px;">
+        <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px;">Click to accept (opens your wallet):</p>
+        <button class="btn btn-green" onclick="acceptLoan('${loan.code}')">✅ Accept Loan</button>
+      </div>` : ''}
     </div>
   `
 }
 
-function acceptLocalLoan(code) {
+function acceptLoan(code) {
   updateLoan(code, { status: 'active' })
   window.history.replaceState({}, '', window.location.pathname)
-  toast('Loan accepted!')
+  toast('Loan accepted! 🎉')
   showScreen('loans')
+}
+
+// ---- Repay Loan ----
+function repayLoan(code, totalRepay, lenderAddress) {
+  const memoData = JSON.stringify({ type: 'faiva_repay', loanCode: code })
+  const signUrl = buildPaymentUrl(wallet.address, lenderAddress, totalRepay, memoData)
+
+  const repayEl = document.createElement('div')
+  repayEl.className = 'card'
+  repayEl.id = 'repay-card'
+  repayEl.innerHTML = `
+    <div class="card-title">Repay Loan</div>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.5;">
+      Sign this payment to repay <strong>${totalRepay} RLUSD</strong>:
+    </p>
+    <a href="${signUrl}" target="_blank" class="btn btn-green" style="margin-bottom:12px;text-decoration:none;">
+      🔐 Open in Xaman to Sign
+    </a>
+    <div class="sign-url-box">${signUrl}</div>
+    <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:12px;" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent.trim());toast('URL copied!')">📋 Copy URL</button>
+    <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="markAsRepaid('${code}',this)">✅ I've Repaid</button>
+  `
+
+  const existing = document.getElementById('repay-card')
+  if (existing) existing.remove()
+  const loansScreen = document.getElementById('screen-loans')
+  loansScreen.insertBefore(repayEl, document.getElementById('loans-list'))
+}
+
+function markAsRepaid(code, btn) {
+  updateLoan(code, { status: 'repaid' })
+  btn.textContent = '✅ Repaid!'
+  btn.disabled = true
+  toast('Marked as repaid! 🎉')
+  setTimeout(() => {
+    const card = document.getElementById('repay-card')
+    if (card) card.remove()
+    loadLoans()
+  }, 1500)
 }
 
 // ---- Load Loans ----
@@ -933,8 +794,8 @@ function loadLoans() {
     const ds = due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     let actions = ''
     if (!isL && loan.status === 'active') actions = `<button class="btn btn-green btn-sm" onclick="repayLoan('${loan.code}','${loan.totalRepay}','${loan.lenderAddress}')">💸 Repay ${loan.totalRepay} RLUSD</button>`
-    else if (!isL && loan.status === 'sent') actions = `<button class="btn btn-green btn-sm" onclick="acceptLocalLoan('${loan.code}')">✅ Accept</button>`
-    else if (isL && loan.status === 'sent') actions = `<button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('${loan.acceptUrl}');toast('Copied!')">📋 Copy Link</button>`
+    else if (!isL && loan.status === 'sent') actions = `<button class="btn btn-green btn-sm" onclick="acceptLoan('${loan.code}')">✅ Accept</button>`
+    else if (isL && loan.status === 'sent') actions = `<button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('${loan.acceptUrl}');toast('Link copied!')">📋 Copy Accept Link</button>`
     return `<div class="loan-item"><div class="loan-item-header"><div class="loan-item-amount">${loan.amount} <small>RLUSD</small></div><span class="badge badge-${sc}">${overdue ? 'OVERDUE' : loan.status.toUpperCase()}</span></div><div class="loan-item-details"><span>👤 ${other.slice(0,8)}...${other.slice(-6)}</span><span>📅 ${ds}</span><span>💰 ${loan.feePercent}%</span></div>${actions ? `<div class="loan-item-actions">${actions}</div>` : ''}</div>`
   }).join('')
 }
@@ -943,32 +804,6 @@ function switchTab(tab) {
   currentTab = tab
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab))
   loadLoans()
-}
-
-// ---- Repay ----
-async function repayLoan(code, totalRepay, lenderAddress) {
-  if (!confirm(`Repay ${totalRepay} RLUSD?`)) return
-  try {
-    const autofill = await getAutofillFields(wallet.address)
-    const tx = {
-      TransactionType: 'Payment', Account: wallet.address, Destination: lenderAddress,
-      Amount: { currency: RLUSD_CURRENCY, value: totalRepay, issuer: RLUSD_ISSUER },
-      Fee: autofill.Fee, Sequence: autofill.Sequence,
-      LastLedgerSequence: autofill.LastLedgerSequence, Flags: 0,
-      Memos: [{ Memo: { MemoData: btoa(JSON.stringify({ type: 'faiva_repay', loanCode: code }))} }]
-    }
-    await wcProvider.request({
-      method: 'xrpl_signTransaction',
-      params: { tx_blob: null, tx_json: tx }
-    }, 'xrpl:0')
-    updateLoan(code, { status: 'repaid' })
-    toast('Loan repaid! 🎉')
-    loadLoans()
-  } catch (err) {
-    const msg = err.message || 'Unknown error'
-    if (/rejected|denied|cancelled/i.test(msg)) showError('You declined the signing.')
-    else showError('Failed: ' + msg)
-  }
 }
 
 // ---- Reminders ----
@@ -1001,54 +836,23 @@ if (dueInput) {
   dueInput.max = maxD.toISOString().split('T')[0]
 }
 
-// Wait for bundled scripts to load, then init
-async function initApp() {
-  try {
-    UniversalProviderModule = await import('https://esm.sh/@walletconnect/universal-provider@2.17.0?bundle&target=es2020')
-    QRCodeModule = await import('https://esm.sh/qrcode@1.5.4?bundle&target=es2020')
-  } catch (err) {
-    console.error('[Init] Failed to load modules:', err)
-    showError('Failed to load wallet connection. Please refresh.')
-    showScreen('connect')
-    return
-  }
+document.getElementById('address-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') connectWallet()
+})
 
-  try {
-    const UniversalProvider = UniversalProviderModule.default
-    wcProvider = await UniversalProvider.init({
-      projectId: WC_PROJECT_ID,
-      metadata: { name: 'FaiVa', description: 'Friend-to-friend RLUSD lending', url: window.location.origin, icons: [] }
-    })
-
-    if (wcProvider.session) {
-      const addr = extractAddress(wcProvider.session)
-      if (addr) {
-        const lines = await xrpl('account_lines', { account: addr, ledger_index: 'validated' })
-        const bspLine = lines.lines?.find(l => l.currency === 'BSP' && l.account === BSP_ISSUER)
-        const bspBal = bspLine ? parseFloat(bspLine.balance) : 0
-        if (bspBal > 0) {
-          wallet = { address: addr, bspBalance: bspBal }
-          document.getElementById('wallet-bar').style.display = 'flex'
-          document.getElementById('wallet-addr').textContent = addr.slice(0,8) + '...' + addr.slice(-6)
-          document.getElementById('wallet-bsp').textContent = bspBal.toFixed(2) + ' BSP'
-          const params = new URLSearchParams(window.location.search)
-          if (params.get('loan')) showAcceptScreen(params.get('loan'))
-          else showScreen('create')
-          document.getElementById('bottom-nav').style.display = 'flex'
-          return
-        }
-      }
-    }
-
-    wcProvider.on('disconnect', () => { if (wallet) { toast('Disconnected'); disconnectWallet() } })
-    showScreen('connect')
-  } catch (err) {
-    console.log('[Init] No saved session')
-    showScreen('connect')
-  }
+// Auto-reconnect if address saved
+const savedAddr = localStorage.getItem('faiva_address')
+if (savedAddr) {
+  document.getElementById('address-input').value = savedAddr
+  connectWallet()
 }
 
-initApp()
+// Save address on connect
+const origConnect = window.connectWallet
+window.connectWallet = async function() {
+  await origConnect()
+  if (wallet) localStorage.setItem('faiva_address', wallet.address)
+}
 </script>
 </body>
 </html>
