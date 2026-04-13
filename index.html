@@ -6,81 +6,6 @@
 <title>FaiVa — Friend-to-Friend Lending</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script type="importmap">
-{
-  "imports": {
-    "@walletconnect/universal-provider": "https://ga.jspm.io/npm:@walletconnect/universal-provider@2.17.0/dist/index.es.js",
-    "qrcode": "https://ga.jspm.io/npm:qrcode@1.5.4/lib/browser.js",
-    "@stablelib/binary": "https://ga.jspm.io/npm:@stablelib/binary@1.0.1/lib/binary.js",
-    "@stablelib/chacha": "https://ga.jspm.io/npm:@stablelib/chacha@1.0.1/lib/chacha.js",
-    "@stablelib/chacha20poly1305": "https://ga.jspm.io/npm:@stablelib/chacha20poly1305@1.0.1/lib/chacha20poly1305.js",
-    "@stablelib/constant-time": "https://ga.jspm.io/npm:@stablelib/constant-time@1.0.1/lib/constant-time.js",
-    "@stablelib/ed25519": "https://ga.jspm.io/npm:@stablelib/ed25519@1.0.3/lib/ed25519.js",
-    "@stablelib/hash": "https://ga.jspm.io/npm:@stablelib/hash@1.0.1/lib/hash.js",
-    "@stablelib/hkdf": "https://ga.jspm.io/npm:@stablelib/hkdf@1.0.1/lib/hkdf.js",
-    "@stablelib/hmac": "https://ga.jspm.io/npm:@stablelib/hmac@1.0.1/lib/hmac.js",
-    "@stablelib/int": "https://ga.jspm.io/npm:@stablelib/int@1.0.1/lib/int.js",
-    "@stablelib/poly1305": "https://ga.jspm.io/npm:@stablelib/poly1305@1.0.1/lib/poly1305.js",
-    "@stablelib/random": "https://ga.jspm.io/npm:@stablelib/random@1.0.2/lib/random.js",
-    "@stablelib/sha256": "https://ga.jspm.io/npm:@stablelib/sha256@1.0.1/lib/sha256.js",
-    "@stablelib/sha512": "https://ga.jspm.io/npm:@stablelib/sha512@1.0.1/lib/sha512.js",
-    "@stablelib/wipe": "https://ga.jspm.io/npm:@stablelib/wipe@1.0.1/lib/wipe.js",
-    "@stablelib/x25519": "https://ga.jspm.io/npm:@stablelib/x25519@1.0.3/lib/x25519.js",
-    "@walletconnect/core": "https://ga.jspm.io/npm:@walletconnect/core@2.17.0/dist/index.es.js",
-    "@walletconnect/environment": "https://ga.jspm.io/npm:@walletconnect/environment@1.0.1/dist/cjs/index.js",
-    "@walletconnect/events": "https://ga.jspm.io/npm:@walletconnect/events@1.0.1/dist/esm/index.js",
-    "@walletconnect/heartbeat": "https://ga.jspm.io/npm:@walletconnect/heartbeat@1.2.2/dist/index.es.js",
-    "@walletconnect/jsonrpc-http-connection": "https://ga.jspm.io/npm:@walletconnect/jsonrpc-http-connection@1.0.8/dist/index.es.js",
-    "@walletconnect/jsonrpc-provider": "https://ga.jspm.io/npm:@walletconnect/jsonrpc-provider@1.0.14/dist/index.es.js",
-    "@walletconnect/jsonrpc-types": "https://ga.jspm.io/npm:@walletconnect/jsonrpc-types@1.0.4/dist/index.es.js",
-    "@walletconnect/jsonrpc-utils": "https://ga.jspm.io/npm:@walletconnect/jsonrpc-utils@1.0.8/dist/esm/index.js",
-    "@walletconnect/jsonrpc-ws-connection": "https://ga.jspm.io/npm:@walletconnect/jsonrpc-ws-connection@1.0.14/dist/index.es.js",
-    "@walletconnect/keyvaluestorage": "https://ga.jspm.io/npm:@walletconnect/keyvaluestorage@1.1.1/dist/index.es.js",
-    "@walletconnect/logger": "https://ga.jspm.io/npm:@walletconnect/logger@2.1.2/dist/index.es.js",
-    "@walletconnect/relay-api": "https://ga.jspm.io/npm:@walletconnect/relay-api@1.0.11/dist/index.es.js",
-    "@walletconnect/relay-auth": "https://ga.jspm.io/npm:@walletconnect/relay-auth@1.0.4/dist/esm/index.js",
-    "@walletconnect/safe-json": "https://ga.jspm.io/npm:@walletconnect/safe-json@1.0.2/dist/esm/index.js",
-    "@walletconnect/sign-client": "https://ga.jspm.io/npm:@walletconnect/sign-client@2.17.0/dist/index.es.js",
-    "@walletconnect/time": "https://ga.jspm.io/npm:@walletconnect/time@1.0.2/dist/cjs/index.js",
-    "@walletconnect/types": "https://ga.jspm.io/npm:@walletconnect/types@2.17.0/dist/index.es.js",
-    "@walletconnect/utils": "https://ga.jspm.io/npm:@walletconnect/utils@2.17.0/dist/index.es.js",
-    "@walletconnect/window-getters": "https://ga.jspm.io/npm:@walletconnect/window-getters@1.0.1/dist/cjs/index.js",
-    "@walletconnect/window-metadata": "https://ga.jspm.io/npm:@walletconnect/window-metadata@1.0.1/dist/cjs/index.js",
-    "bn.js": "https://ga.jspm.io/npm:bn.js@4.12.3/lib/bn.js",
-    "brorand": "https://ga.jspm.io/npm:brorand@1.1.0/index.js",
-    "buffer": "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js",
-    "cross-fetch": "https://ga.jspm.io/npm:cross-fetch@3.2.0/dist/browser-ponyfill.js",
-    "crypto": "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/crypto.js",
-    "decode-uri-component": "https://ga.jspm.io/npm:decode-uri-component@0.2.2/index.js",
-    "destr": "https://ga.jspm.io/npm:destr@2.0.5/dist/index.mjs",
-    "detect-browser": "https://ga.jspm.io/npm:detect-browser@5.3.0/es/index.js",
-    "dijkstrajs": "https://ga.jspm.io/npm:dijkstrajs@1.0.3/dijkstra.js",
-    "elliptic": "https://ga.jspm.io/npm:elliptic@6.6.1/lib/elliptic.js",
-    "events": "https://ga.jspm.io/npm:events@3.3.0/events.js",
-    "filter-obj": "https://ga.jspm.io/npm:filter-obj@1.1.0/index.js",
-    "hash.js": "https://ga.jspm.io/npm:hash.js@1.1.7/lib/hash.js",
-    "hmac-drbg": "https://ga.jspm.io/npm:hmac-drbg@1.0.1/lib/hmac-drbg.js",
-    "idb-keyval": "https://ga.jspm.io/npm:idb-keyval@6.2.2/dist/index.js",
-    "inherits": "https://ga.jspm.io/npm:inherits@2.0.4/inherits_browser.js",
-    "lodash.isequal": "https://ga.jspm.io/npm:lodash.isequal@4.5.0/index.js",
-    "minimalistic-assert": "https://ga.jspm.io/npm:minimalistic-assert@1.0.1/index.js",
-    "minimalistic-crypto-utils": "https://ga.jspm.io/npm:minimalistic-crypto-utils@1.0.1/lib/utils.js",
-    "multiformats/basics": "https://ga.jspm.io/npm:multiformats@9.9.0/esm/src/basics.js",
-    "pino": "https://ga.jspm.io/npm:pino@7.11.0/browser.js",
-    "process": "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/process.js",
-    "query-string": "https://ga.jspm.io/npm:query-string@7.1.3/index.js",
-    "quick-format-unescaped": "https://ga.jspm.io/npm:quick-format-unescaped@4.0.4/index.js",
-    "split-on-first": "https://ga.jspm.io/npm:split-on-first@1.1.0/index.js",
-    "strict-uri-encode": "https://ga.jspm.io/npm:strict-uri-encode@2.0.0/index.js",
-    "tslib": "https://ga.jspm.io/npm:tslib@1.14.1/tslib.es6.js",
-    "uint8arrays": "https://ga.jspm.io/npm:uint8arrays@3.1.0/esm/src/index.js",
-    "uint8arrays/concat": "https://ga.jspm.io/npm:uint8arrays@3.1.0/esm/src/concat.js",
-    "uint8arrays/from-string": "https://ga.jspm.io/npm:uint8arrays@3.1.0/esm/src/from-string.js",
-    "uint8arrays/to-string": "https://ga.jspm.io/npm:uint8arrays@3.1.0/esm/src/to-string.js",
-    "unstorage": "https://ga.jspm.io/npm:unstorage@1.17.5/dist/index.mjs"
-  }
-}
-</script>
 <style>
 :root {
   --bg: #0a0a0f;
@@ -116,10 +41,7 @@ body {
 .container { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
 
 /* Header */
-.header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 0 24px;
-}
+.header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 24px; }
 .logo { display: flex; align-items: center; gap: 10px; }
 .logo-icon {
   width: 36px; height: 36px; border-radius: 10px;
@@ -188,9 +110,7 @@ body {
 .qr-status { font-size: 12px; color: var(--text-dim); margin-top: 12px; }
 
 /* Loading */
-.loading-screen {
-  text-align: center; padding: 60px 20px;
-}
+.loading-screen { text-align: center; padding: 60px 20px; }
 .loading-screen .spinner-lg {
   width: 40px; height: 40px; border: 3px solid var(--border);
   border-top-color: var(--accent); border-radius: 50%;
@@ -406,7 +326,6 @@ input[type="range"]::-moz-range-thumb {
 .accept-loan .detail-value { font-weight: 600; }
 .accept-loan .detail-value.big { font-size: 22px; font-weight: 700; color: var(--accent); }
 
-/* Responsive tweaks */
 @media (min-width: 500px) {
   .container { max-width: 520px; }
 }
@@ -415,7 +334,6 @@ input[type="range"]::-moz-range-thumb {
 <body>
 <div class="app-bg"></div>
 <div class="container">
-  <!-- Header -->
   <div class="header">
     <div class="logo">
       <div class="logo-icon">F</div>
@@ -423,41 +341,36 @@ input[type="range"]::-moz-range-thumb {
     </div>
     <div class="header-badge">BSP GATED</div>
   </div>
-
-  <!-- Error Banner -->
   <div id="error-banner" class="error-banner"></div>
 
-  <!-- SCREEN: Loading -->
-  <div id="screen-loading" class="screen">
+  <!-- Loading Screen -->
+  <div id="screen-loading" class="screen active">
     <div class="loading-screen">
       <div class="spinner-lg"></div>
-      <p style="color:var(--text-dim);">Loading FaiVa...</p>
+      <p style="color:var(--text-dim)">Loading FaiVa...</p>
     </div>
   </div>
 
-  <!-- SCREEN: Connect -->
+  <!-- Connect Screen -->
   <div id="screen-connect" class="screen">
     <div class="connect-screen">
       <h2>Connect your wallet</h2>
       <p>Scan the QR code with Joey Wallet on your phone. No seed needed — just scan and go.</p>
-
       <button class="connect-btn" id="connect-btn" onclick="connectWallet()">
-        <span class="icon">🦘</span>
-        Connect via Joey Wallet
+        <span class="icon">🦘</span> Connect via Joey Wallet
       </button>
-
       <div class="connect-hint">Don't have Joey? <a href="https://joeywallet.xyz" target="_blank">Download free</a> — sign in with Google in 5 seconds.</div>
     </div>
   </div>
 
-  <!-- SCREEN: Accept Loan -->
+  <!-- Accept Loan -->
   <div id="screen-accept" class="screen">
     <div class="accept-loan" id="accept-content" style="text-align:center;">
       <p style="color:var(--text-dim);margin-bottom:24px;">Loading loan details...</p>
     </div>
   </div>
 
-  <!-- SCREEN: Create Loan -->
+  <!-- Create Loan -->
   <div id="screen-create" class="screen">
     <div id="wallet-bar" class="wallet-bar" style="display:none;">
       <div class="wallet-dot"></div>
@@ -465,7 +378,6 @@ input[type="range"]::-moz-range-thumb {
       <span class="wallet-bsp" id="wallet-bsp"></span>
       <button class="wallet-disconnect" onclick="disconnectWallet()" title="Disconnect">✕</button>
     </div>
-
     <div class="card">
       <div class="card-title">Create a Loan</div>
       <div class="form-group">
@@ -510,12 +422,10 @@ input[type="range"]::-moz-range-thumb {
         <div class="summary-row total"><span class="label">Friend repays</span><span class="value" id="summary-total">—</span></div>
       </div>
     </div>
-    <button class="btn btn-primary" id="create-btn" onclick="createLoan()" disabled>
-      Create & Send Loan
-    </button>
+    <button class="btn btn-primary" id="create-btn" onclick="createLoan()" disabled>Create & Send Loan</button>
   </div>
 
-  <!-- SCREEN: My Loans -->
+  <!-- My Loans -->
   <div id="screen-loans" class="screen">
     <div class="tabs">
       <button class="tab active" data-tab="active" onclick="switchTab('active')">Active</button>
@@ -525,26 +435,18 @@ input[type="range"]::-moz-range-thumb {
     <div id="loans-list"></div>
   </div>
 
-  <!-- SCREEN: Reminders -->
+  <!-- Reminders -->
   <div id="screen-reminders" class="screen">
     <div id="reminders-list"></div>
   </div>
 </div>
 
-<!-- Bottom Navigation -->
 <div class="bottom-nav" id="bottom-nav" style="display:none;">
-  <button class="nav-btn active" data-screen="create" onclick="showScreen('create')">
-    <span class="nav-icon">＋</span>New Loan
-  </button>
-  <button class="nav-btn" data-screen="loans" onclick="showScreen('loans')">
-    <span class="nav-icon">📋</span>My Loans
-  </button>
-  <button class="nav-btn" data-screen="reminders" onclick="showScreen('reminders')">
-    <span class="nav-icon">🔔</span>Reminders
-  </button>
+  <button class="nav-btn active" data-screen="create" onclick="showScreen('create')"><span class="nav-icon">＋</span>New Loan</button>
+  <button class="nav-btn" data-screen="loans" onclick="showScreen('loans')"><span class="nav-icon">📋</span>My Loans</button>
+  <button class="nav-btn" data-screen="reminders" onclick="showScreen('reminders')"><span class="nav-icon">🔔</span>Reminders</button>
 </div>
 
-<!-- Toast -->
 <div id="toast" class="toast"></div>
 
 <!-- QR Overlay -->
@@ -559,6 +461,9 @@ input[type="range"]::-moz-range-thumb {
   </div>
 </div>
 
+<script src="https://esm.sh/@walletconnect/universal-provider@2.17.0?bundle&target=es2020" type="module" async></script>
+<script src="https://esm.sh/qrcode@1.5.4?bundle&target=es2020" type="module" async></script>
+
 <script type="module">
 // ---- Configuration ----
 const XRPL_RPC = 'https://rpc.xrplclaw.com'
@@ -566,16 +471,17 @@ const BSP_ISSUER = 'rG47hi9xKvEhjCD8LXhfxjRzuEEBxwGUbL'
 const RLUSD_ISSUER = 'rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De'
 const RLUSD_CURRENCY = '524C555344000000000000000000000000000000'
 const WC_PROJECT_ID = '7011b636254f3ae563decfce6021cd7f'
-const JOEY_WALLET_ID = 'd9f5432e932c6fad8e19a0cea9d4a3372a84aed16e98a52e6655dd2821a63404'
 
 // ---- State ----
 let wallet = null
 let currentTab = 'active'
 let wcProvider = null
+let UniversalProviderModule = null
+let QRCodeModule = null
+let qrModuleLoaded = false
 
 // ---- Environment ----
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-const isInAppBrowser = isMobile && !/Safari\//i.test(navigator.userAgent) && !/Chrome\//i.test(navigator.userAgent)
 
 // ---- Expose globals ----
 window.connectWallet = connectWallet
@@ -669,6 +575,20 @@ function closeQR() {
   document.getElementById('qr-overlay').classList.remove('show')
 }
 
+function renderQR(uri) {
+  const canvas = document.getElementById('qr-canvas')
+  if (QRCodeModule) {
+    QRCodeModule.default.toCanvas(canvas, uri, {
+      width: 240, margin: 2,
+      color: { dark: '#0a0a0f', light: '#ffffff' }
+    }, (err) => { if (err) console.error('QR error:', err) })
+  } else {
+    // Fallback: simple text-based QR display
+    console.log('QR URI:', uri)
+    canvas.parentElement.innerHTML = `<p style="color:var(--text);font-size:12px;word-break:break-all;">${uri}</p>`
+  }
+}
+
 // ---- Extract Address ----
 function extractAddress(session) {
   for (const key of Object.keys(session?.namespaces ?? {})) {
@@ -685,8 +605,15 @@ async function connectWallet() {
   btn.innerHTML = '<span class="spinner"></span> Initializing...'
 
   try {
-    const UniversalProvider = (await import('@walletconnect/universal-provider')).default
-    const QRCode = (await import('qrcode')).default
+    // Wait for bundled modules to load
+    if (!UniversalProviderModule) {
+      btn.innerHTML = '<span class="spinner"></span> Loading WalletConnect...'
+      UniversalProviderModule = await import('https://esm.sh/@walletconnect/universal-provider@2.17.0?bundle&target=es2020')
+      QRCodeModule = await import('https://esm.sh/qrcode@1.5.4?bundle&target=es2020')
+    }
+
+    const UniversalProvider = UniversalProviderModule.default
+    const QRCode = QRCodeModule.default
 
     // Check for existing session
     if (wcProvider?.session) {
@@ -722,19 +649,15 @@ async function connectWallet() {
 
     btn.innerHTML = '<span class="spinner"></span> Generating QR...'
 
-    // Manually create pairing to get the URI directly
-    // (display_uri event is unreliable with UniversalProvider)
+    // Create pairing manually to get URI
     const { uri, pairingTopic } = await wcProvider.client.core.pairing.create()
 
-    // Show QR code immediately
-    QRCode.toCanvas(document.getElementById('qr-canvas'), uri, {
-      width: 240, margin: 2,
-      color: { dark: '#0a0a0f', light: '#ffffff' }
-    }, (err) => { if (err) console.error('QR error:', err) })
+    // Show QR immediately
+    renderQR(uri)
     document.getElementById('qr-overlay').classList.add('show')
     document.getElementById('qr-status').textContent = 'Waiting for you to scan...'
 
-    // Now connect — this will use the pairing we just created
+    // Connect using the pairing
     await wcProvider.connect({
       pairingTopic,
       namespaces: {
@@ -770,7 +693,6 @@ async function onWalletConnected(address) {
     }
 
     wallet = { address, bspBalance: bspBal }
-
     document.getElementById('wallet-bar').style.display = 'flex'
     document.getElementById('wallet-addr').textContent = address.slice(0, 8) + '...' + address.slice(-6)
     document.getElementById('wallet-bsp').textContent = bspBal.toFixed(2) + ' BSP'
@@ -924,11 +846,9 @@ async function showAcceptScreen(loanCode) {
   const loans = getLoans()
   const local = loans.find(l => l.code === loanCode)
   const content = document.getElementById('accept-content')
-
   if (local && local.borrowerAddress === wallet.address) {
     renderAccept(content, local); return
   }
-
   try {
     const txData = await xrpl('account_tx', {
       account: wallet.address, ledger_index_min: -1, ledger_index_max: -1, limit: 50, forward: false
@@ -1081,10 +1001,20 @@ if (dueInput) {
   dueInput.max = maxD.toISOString().split('T')[0]
 }
 
-// Auto-reconnect on load
-window.addEventListener('load', async () => {
+// Wait for bundled scripts to load, then init
+async function initApp() {
   try {
-    const UniversalProvider = (await import('@walletconnect/universal-provider')).default
+    UniversalProviderModule = await import('https://esm.sh/@walletconnect/universal-provider@2.17.0?bundle&target=es2020')
+    QRCodeModule = await import('https://esm.sh/qrcode@1.5.4?bundle&target=es2020')
+  } catch (err) {
+    console.error('[Init] Failed to load modules:', err)
+    showError('Failed to load wallet connection. Please refresh.')
+    showScreen('connect')
+    return
+  }
+
+  try {
+    const UniversalProvider = UniversalProviderModule.default
     wcProvider = await UniversalProvider.init({
       projectId: WC_PROJECT_ID,
       metadata: { name: 'FaiVa', description: 'Friend-to-friend RLUSD lending', url: window.location.origin, icons: [] }
@@ -1113,10 +1043,12 @@ window.addEventListener('load', async () => {
     wcProvider.on('disconnect', () => { if (wallet) { toast('Disconnected'); disconnectWallet() } })
     showScreen('connect')
   } catch (err) {
-    console.log('[Init] No session:', err.message)
+    console.log('[Init] No saved session')
     showScreen('connect')
   }
-})
+}
+
+initApp()
 </script>
 </body>
 </html>
