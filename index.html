@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FaiVa — Friend-to-Friend Lending</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/xrpl@4.0.0/build/xrpl-latest-min.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c26;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --text-dim: #8888a0;
+  --accent: #7c5cfc;
+  --accent-glow: rgba(124, 92, 252, 0.3);
+  --green: #22c55e;
+  --green-bg: rgba(34, 197, 94, 0.1);
+  --red: #ef4444;
+  --red-bg: rgba(239, 68, 68, 0.1);
+  --amber: #f59e0b;
+  --amber-bg: rgba(245, 158, 11, 0.1);
+  --radius: 14px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.app-bg {
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 10%, rgba(124, 92, 252, 0.08), transparent),
+    radial-gradient(ellipse 400px 300px at 80% 80%, rgba(34, 197, 94, 0.05), transparent);
+}
+.container { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
+
+/* Header */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0 24px;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; color: white;
+}
+.logo-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.logo-text span { color: var(--accent); }
+.header-badge {
+  font-size: 10px; font-weight: 600; padding: 4px 8px;
+  background: var(--accent-glow); color: var(--accent);
+  border-radius: 20px; letter-spacing: 0.5px;
+}
+
+/* Screens */
+.screen { display: none; }
+.screen.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* Connect Screen */
+.connect-screen { text-align: center; padding-top: 60px; }
+.connect-screen h2 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+.connect-screen p { color: var(--text-dim); font-size: 14px; line-height: 1.6; margin-bottom: 32px; }
+.connect-input-wrap {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 4px; margin-bottom: 16px; display: flex; align-items: center;
+}
+.connect-input-wrap input {
+  flex: 1; background: none; border: none; padding: 14px 12px;
+  color: var(--text); font-size: 14px; font-family: 'JetBrains Mono', monospace;
+  outline: none;
+}
+.connect-input-wrap input::placeholder { color: var(--text-dim); }
+.connect-input-wrap button {
+  background: var(--accent); border: none; color: white;
+  padding: 12px 20px; border-radius: 10px; font-weight: 600;
+  font-size: 14px; cursor: pointer; white-space: nowrap;
+}
+.connect-input-wrap button:disabled { opacity: 0.5; cursor: not-allowed; }
+.connect-hint { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+.connect-warn {
+  margin-top: 24px; padding: 12px 16px; border-radius: 10px;
+  background: var(--amber-bg); border: 1px solid rgba(245,158,11,0.2);
+  font-size: 12px; color: var(--amber); text-align: left; line-height: 1.5;
+}
+
+/* Error / Status */
+.error-banner {
+  display: none; background: var(--red-bg); border: 1px solid rgba(239,68,68,0.2);
+  color: var(--red); padding: 12px 16px; border-radius: 10px;
+  font-size: 13px; margin-bottom: 16px; line-height: 1.5;
+}
+.error-banner.show { display: block; animation: fadeIn 0.3s ease; }
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); padding: 12px 20px; border-radius: 12px;
+  font-size: 13px; font-weight: 500; z-index: 999;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.show { opacity: 1; }
+
+/* Cards */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+}
+.card-title {
+  font-size: 14px; font-weight: 600; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;
+}
+
+/* Form Elements */
+.form-group { margin-bottom: 20px; }
+.form-label {
+  display: block; font-size: 13px; font-weight: 600;
+  color: var(--text-dim); margin-bottom: 8px;
+}
+.form-input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; color: var(--text);
+  font-size: 15px; font-family: inherit; outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text-dim); }
+
+/* Slider */
+.slider-wrap { padding: 8px 0; }
+.slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.slider-value {
+  font-size: 28px; font-weight: 800; color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.slider-value small { font-size: 14px; font-weight: 600; }
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; height: 6px;
+  background: var(--surface2); border-radius: 3px; outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 24px; height: 24px;
+  background: var(--accent); border-radius: 50%; cursor: pointer;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 24px; height: 24px; background: var(--accent);
+  border: none; border-radius: 50%; cursor: pointer;
+}
+
+/* Calendar */
+.calendar-input { position: relative; }
+.calendar-input .form-input { padding-right: 44px; }
+.calendar-icon {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; opacity: 0.5;
+}
+
+/* Summary */
+.loan-summary {
+  background: var(--surface2); border-radius: 10px; padding: 16px;
+  margin-top: 16px;
+}
+.summary-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; font-size: 14px;
+}
+.summary-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+.summary-row .label { color: var(--text-dim); }
+.summary-row .value { font-weight: 600; font-variant-numeric: tabular-nums; }
+.summary-row.total .value { color: var(--accent); font-size: 16px; font-weight: 700; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 14px 20px; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #6d4de8);
+  color: white;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+.btn-primary:not(:disabled):active { transform: scale(0.98); }
+.btn-secondary {
+  background: var(--surface2); color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-sm { padding: 10px 16px; font-size: 13px; width: auto; }
+.btn-green { background: var(--green); color: #000; }
+.btn-green:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Tabs */
+.tabs {
+  display: flex; gap: 4px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 4px; margin-bottom: 20px;
+}
+.tab {
+  flex: 1; padding: 10px; text-align: center; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--text-dim); transition: all 0.2s; border: none;
+  background: none; font-family: inherit;
+}
+.tab.active { background: var(--accent); color: white; }
+
+/* Loan Items */
+.loan-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+}
+.loan-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.loan-item-amount { font-size: 20px; font-weight: 700; }
+.loan-item-amount small { font-size: 13px; color: var(--text-dim); font-weight: 500; }
+.loan-item-code {
+  font-size: 11px; font-weight: 600; padding: 3px 8px;
+  background: var(--surface2); border-radius: 6px; color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+.loan-item-details { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-dim); }
+.loan-item-details span { display: flex; align-items: center; gap: 4px; }
+.loan-item-actions { display: flex; gap: 8px; margin-top: 12px; }
+.loan-item-actions .btn { flex: 1; }
+
+/* Status badges */
+.badge {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px; letter-spacing: 0.3px;
+}
+.badge-pending { background: var(--amber-bg); color: var(--amber); }
+.badge-active { background: var(--green-bg); color: var(--green); }
+.badge-repaid { background: var(--surface2); color: var(--text-dim); }
+.badge-overdue { background: var(--red-bg); color: var(--red); }
+
+/* Reminder */
+.reminder-card {
+  background: var(--amber-bg); border: 1px solid rgba(245,158,11,0.2);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+}
+.reminder-card .reminder-text { font-size: 13px; line-height: 1.5; color: var(--amber); }
+.reminder-card .reminder-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 48px 20px; color: var(--text-dim);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+.empty-state p { font-size: 14px; }
+
+/* Nav bar */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; padding: 8px 16px; padding-bottom: max(8px, env(safe-area-inset-bottom));
+  z-index: 100;
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 8px; border: none; background: none;
+  color: var(--text-dim); font-size: 10px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: color 0.2s;
+}
+.nav-btn.active { color: var(--accent); }
+.nav-btn .nav-icon { font-size: 20px; }
+
+/* Wallet bar */
+.wallet-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 12px; margin-bottom: 16px;
+  font-size: 12px;
+}
+.wallet-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.wallet-addr { font-family: 'JetBrains Mono', monospace; color: var(--text-dim); }
+.wallet-bsp { margin-left: auto; font-weight: 600; color: var(--accent); }
+.wallet-disconnect {
+  background: none; border: none; color: var(--text-dim); cursor: pointer;
+  font-size: 16px; padding: 4px; opacity: 0.5;
+}
+.wallet-disconnect:hover { opacity: 1; }
+
+/* Spinner */
+.spinner {
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: white; border-radius: 50%;
+  animation: spin 0.6s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Accept loan screen */
+.accept-loan { text-align: center; padding: 20px 0; }
+.accept-loan .loan-detail-card { text-align: left; }
+.accept-loan .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.accept-loan .detail-row:last-child { border: none; }
+.accept-loan .detail-label { color: var(--text-dim); }
+.accept-loan .detail-value { font-weight: 600; }
+.accept-loan .detail-value.big { font-size: 22px; font-weight: 700; color: var(--accent); }
+
+/* Responsive tweaks */
+@media (min-width: 500px) {
+  .container { max-width: 520px; }
+}
+</style>
+</head>
+<body>
+<div class="app-bg"></div>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">F</div>
+      <div class="logo-text">Fai<span>Va</span></div>
+    </div>
+    <div class="header-badge">BSP GATED</div>
+  </div>
+
+  <!-- Error Banner -->
+  <div id="error-banner" class="error-banner"></div>
+
+  <!-- SCREEN: Connect -->
+  <div id="screen-connect" class="screen active">
+    <div class="connect-screen">
+      <h2>Connect your XRPL wallet</h2>
+      <p>FaiVa lets you lend RLUSD to friends — no banks, no interest, just trust. Enter your wallet seed to get started.</p>
+      <div class="connect-input-wrap">
+        <input type="password" id="seed-input" placeholder="sEd... or secret" autocomplete="off" spellcheck="false">
+        <button id="connect-btn" onclick="connectWallet()">Connect</button>
+      </div>
+      <div class="connect-hint">Your seed is used only in your browser — never sent to any server.</div>
+      <div class="connect-warn">⚠️ This is a hot wallet connection. Never share your seed publicly. For significant funds, use a hardware wallet or Xaman app.</div>
+    </div>
+  </div>
+
+  <!-- SCREEN: Accept Loan (for borrowers) -->
+  <div id="screen-accept" class="screen">
+    <div class="accept-loan" id="accept-content" style="text-align:center;">
+      <p style="color:var(--text-dim);margin-bottom:24px;">Loading loan details...</p>
+    </div>
+  </div>
+
+  <!-- SCREEN: Create Loan -->
+  <div id="screen-create" class="screen">
+    <div id="wallet-bar" class="wallet-bar" style="display:none;">
+      <div class="wallet-dot"></div>
+      <span class="wallet-addr" id="wallet-addr"></span>
+      <span class="wallet-bsp" id="wallet-bsp"></span>
+      <button class="wallet-disconnect" onclick="disconnectWallet()" title="Disconnect">✕</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Create a Loan</div>
+
+      <div class="form-group">
+        <label class="form-label">Friend's XRPL Address</label>
+        <input class="form-input" id="borrower-input" type="text" placeholder="r..." autocomplete="off" spellcheck="false">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Loan Amount (RLUSD)</label>
+        <input class="form-input" id="amount-input" type="number" placeholder="100" min="1" step="0.01" oninput="updateSummary()">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Your Fee</label>
+        <div class="slider-wrap">
+          <div class="slider-header">
+            <span class="form-label" style="margin:0">Fee percentage</span>
+            <span class="slider-value" id="fee-display">5<small>%</small></span>
+          </div>
+          <input type="range" id="fee-slider" min="0" max="20" value="5" step="0.5" oninput="updateSummary()">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-top:6px;">
+            <span>0%</span><span>10%</span><span>20%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Repayment Date</label>
+        <div class="calendar-input">
+          <input class="form-input" id="due-date-input" type="date" onchange="updateSummary()">
+          <span class="calendar-icon">📅</span>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="setDueDate(1)">1 day</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDueDate(7)">1 week</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDueDate(14)">2 weeks</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDueDate(30)">1 month</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDueDate(90)">3 months</button>
+        </div>
+      </div>
+
+      <div class="loan-summary" id="loan-summary" style="display:none;">
+        <div class="summary-row">
+          <span class="label">Loan amount</span>
+          <span class="value" id="summary-amount">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Fee</span>
+          <span class="value" id="summary-fee">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Due date</span>
+          <span class="value" id="summary-due">—</span>
+        </div>
+        <div class="summary-row total">
+          <span class="label">Friend repays</span>
+          <span class="value" id="summary-total">—</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="create-btn" onclick="createLoan()" disabled>
+      Create & Send Loan
+    </button>
+  </div>
+
+  <!-- SCREEN: My Loans -->
+  <div id="screen-loans" class="screen">
+    <div class="tabs">
+      <button class="tab active" data-tab="active" onclick="switchTab('active')">Active</button>
+      <button class="tab" data-tab="sent" onclick="switchTab('sent')">Sent</button>
+      <button class="tab" data-tab="repaid" onclick="switchTab('repaid')">Repaid</button>
+    </div>
+    <div id="loans-list"></div>
+  </div>
+
+  <!-- SCREEN: Reminders -->
+  <div id="screen-reminders" class="screen">
+    <div id="reminders-list"></div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav" id="bottom-nav" style="display:none;">
+  <button class="nav-btn active" data-screen="create" onclick="showScreen('create')">
+    <span class="nav-icon">＋</span>
+    New Loan
+  </button>
+  <button class="nav-btn" data-screen="loans" onclick="showScreen('loans')">
+    <span class="nav-icon">📋</span>
+    My Loans
+  </button>
+  <button class="nav-btn" data-screen="reminders" onclick="showScreen('reminders')">
+    <span class="nav-icon">🔔</span>
+    Reminders
+  </button>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ---- Configuration ----
+const XRPL_RPC = 'https://rpc.xrplclaw.com'
+const BSP_ISSUER = 'rG47hi9xKvEhjCD8LXhfxjRzuEEBxwGUbL'
+const RLUSD_ISSUER = 'rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De'
+const RLUSD_CURRENCY = '524C555344000000000000000000000000000000'
+
+// ---- State ----
+let wallet = null // { seed, address, bspBalance }
+let currentTab = 'active'
+
+// ---- XRPL RPC Helper ----
+async function xrpl(method, params) {
+  const res = await fetch(XRPL_RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ method, params: params || [] })
+  })
+  const data = await res.json()
+  if (data.error) throw new Error(data.error_message || data.error)
+  return data.result
+}
+
+// ---- Toast ----
+function toast(msg) {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 3000)
+}
+
+// ---- Error ----
+function showError(msg) {
+  const el = document.getElementById('error-banner')
+  el.textContent = msg
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 8000)
+}
+
+// ---- Screens ----
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
+  document.getElementById('screen-' + name).classList.add('active')
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.screen === name)
+  })
+  if (name === 'loans') loadLoans()
+  if (name === 'reminders') loadReminders()
+}
+
+// ---- Local Storage: Loans ----
+function getLoans() {
+  try { return JSON.parse(localStorage.getItem('faiva_loans') || '[]') } catch { return [] }
+}
+function saveLoans(loans) {
+  localStorage.setItem('faiva_loans', JSON.stringify(loans))
+}
+function addLoan(loan) {
+  const loans = getLoans()
+  loans.push(loan)
+  saveLoans(loans)
+  return loan
+}
+function updateLoan(code, updates) {
+  const loans = getLoans()
+  const idx = loans.findIndex(l => l.code === code)
+  if (idx >= 0) { Object.assign(loans[idx], updates); saveLoans(loans) }
+}
+
+// ---- Generate Loan Code ----
+function generateLoanCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = 'FV-'
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)]
+  return code
+}
+
+// ---- Connect Wallet ----
+async function connectWallet() {
+  const seed = document.getElementById('seed-input').value.trim()
+  if (!seed) { showError('Please enter your wallet seed.'); return; }
+
+  const btn = document.getElementById('connect-btn')
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span>'
+
+  try {
+    const { Wallet } = xrpl
+    const w = Wallet.fromSeed(seed)
+
+    // Check BSP balance
+    const lines = await xrpl('account_lines', {
+      account: w.address,
+      ledger_index: 'validated'
+    })
+    const bspLine = lines.lines?.find(l => l.currency === 'BSP' && l.account === BSP_ISSUER)
+    const bspBal = bspLine ? parseFloat(bspLine.balance) : 0
+
+    if (bspBal <= 0) {
+      showError('You need to hold BSP tokens to access FaiVa. Get some BSP to continue.')
+      btn.disabled = false
+      btn.textContent = 'Connect'
+      return
+    }
+
+    wallet = { seed, address: w.address, bspBalance: bspBal }
+
+    // Show wallet bar
+    document.getElementById('wallet-bar').style.display = 'flex'
+    document.getElementById('wallet-addr').textContent = w.address.slice(0, 8) + '...' + w.address.slice(-6)
+    document.getElementById('wallet-bsp').textContent = bspBal.toFixed(2) + ' BSP'
+
+    // Set min date
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    document.getElementById('due-date-input').min = tomorrow.toISOString().split('T')[0]
+
+    // Check if this is an accept-loan link
+    const params = new URLSearchParams(window.location.search)
+    const loanParam = params.get('loan')
+    if (loanParam) {
+      showAcceptScreen(loanParam)
+    } else {
+      showScreen('create')
+    }
+    document.getElementById('bottom-nav').style.display = 'flex'
+    toast('Connected! BSP balance: ' + bspBal.toFixed(2))
+  } catch (err) {
+    showError('Failed to connect: ' + err.message)
+  }
+
+  btn.disabled = false
+  btn.textContent = 'Connect'
+}
+
+function disconnectWallet() {
+  wallet = null
+  document.getElementById('seed-input').value = ''
+  document.getElementById('wallet-bar').style.display = 'none'
+  document.getElementById('bottom-nav').style.display = 'none'
+  showScreen('connect')
+  toast('Disconnected')
+}
+
+// ---- Summary ----
+function updateSummary() {
+  const amount = parseFloat(document.getElementById('amount-input').value) || 0
+  const fee = parseFloat(document.getElementById('fee-slider').value) || 0
+  const due = document.getElementById('due-date-input').value
+
+  document.getElementById('fee-display').innerHTML = fee + '<small>%</small>'
+
+  const valid = amount > 0 && due
+  document.getElementById('create-btn').disabled = !valid
+
+  if (valid) {
+    const feeAmt = (amount * fee / 100).toFixed(2)
+    const total = (amount + parseFloat(feeAmt)).toFixed(2)
+    document.getElementById('summary-amount').textContent = amount.toFixed(2) + ' RLUSD'
+    document.getElementById('summary-fee').textContent = feeAmt + ' RLUSD'
+    document.getElementById('summary-due').textContent = new Date(due + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    document.getElementById('summary-total').textContent = total + ' RLUSD'
+    document.getElementById('loan-summary').style.display = 'block'
+  } else {
+    document.getElementById('loan-summary').style.display = 'none'
+  }
+}
+
+function setDueDate(days) {
+  const d = new Date()
+  d.setDate(d.getDate() + days)
+  document.getElementById('due-date-input').value = d.toISOString().split('T')[0]
+  updateSummary()
+}
+
+// ---- Create Loan ----
+async function createLoan() {
+  const borrower = document.getElementById('borrower-input').value.trim()
+  const amount = parseFloat(document.getElementById('amount-input').value)
+  const fee = parseFloat(document.getElementById('fee-slider').value)
+  const due = document.getElementById('due-date-input').value
+
+  if (!borrower.startsWith('r') || borrower.length < 25) {
+    showError('Please enter a valid XRPL address (starts with r).')
+    return
+  }
+  if (!amount || amount <= 0) { showError('Enter a valid loan amount.'); return; }
+  if (!due) { showError('Select a repayment date.'); return; }
+
+  const btn = document.getElementById('create-btn')
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span> Sending RLUSD...'
+
+  try {
+    const feeAmt = (amount * fee / 100).toFixed(2)
+    const totalRepay = (amount + parseFloat(feeAmt)).toFixed(2)
+    const loanCode = generateLoanCode()
+
+    // Send RLUSD to borrower
+    const tx = {
+      TransactionType: 'Payment',
+      Account: wallet.address,
+      Destination: borrower,
+      Amount: {
+        currency: RLUSD_CURRENCY,
+        issuer: RLUSD_ISSUER,
+        value: amount.toFixed(2)
+      },
+      Memos: [{
+        Memo: {
+          MemoData: btoa(JSON.stringify({
+            type: 'faiva_loan',
+            code: loanCode,
+            lender: wallet.address,
+            borrower: borrower,
+            amount: amount.toFixed(2),
+            feePercent: fee,
+            feeAmount: feeAmt,
+            totalRepay: totalRepay,
+            dueDate: due
+          }))
+        }
+      }]
+    }
+
+    const { Wallet, Client } = xrpl
+    const client = new Client('wss://rpc.xrplclaw.com/ws')
+    await client.connect()
+
+    const w = Wallet.fromSeed(wallet.seed)
+    const prepared = await client.autofill(tx)
+    const signed = w.sign(prepared)
+    const result = await client.submitAndWait(signed.tx_blob)
+    await client.disconnect()
+
+    if (result.result.meta.TransactionResult !== 'tesSUCCESS') {
+      throw new Error('Transaction failed: ' + result.result.meta.TransactionResult)
+    }
+
+    // Generate accept link
+    const baseUrl = window.location.origin + window.location.pathname
+    const acceptUrl = `${baseUrl}?loan=${loanCode}`
+
+    // Save loan locally
+    addLoan({
+      code: loanCode,
+      lenderAddress: wallet.address,
+      borrowerAddress: borrower,
+      amount: amount.toFixed(2),
+      feePercent: fee,
+      feeAmount: feeAmt,
+      totalRepay: totalRepay,
+      dueDate: due,
+      createdAt: new Date().toISOString(),
+      status: 'sent',
+      txHash: result.result.hash || '',
+      acceptUrl: acceptUrl
+    })
+
+    toast('Loan sent! Code: ' + loanCode)
+
+    // Reset form
+    document.getElementById('borrower-input').value = ''
+    document.getElementById('amount-input').value = ''
+    document.getElementById('due-date-input').value = ''
+    document.getElementById('fee-slider').value = 5
+    updateSummary()
+
+    // Show the share info
+    showLoanShare(loanCode, acceptUrl, borrower, totalRepay)
+
+  } catch (err) {
+    showError('Failed to create loan: ' + err.message)
+  }
+
+  btn.disabled = false
+  btn.textContent = 'Create & Send Loan'
+}
+
+// ---- Share loan after creation ----
+function showLoanShare(code, url, borrower, totalRepay) {
+  const msg = `I've sent you ${totalRepay} RLUSD via FaiVa! Accept it here: ${url}`
+  const shareContent = document.createElement('div')
+  shareContent.className = 'card'
+  shareContent.innerHTML = `
+    <div class="card-title">Loan Created ✅</div>
+    <div class="loan-summary">
+      <div class="summary-row">
+        <span class="label">Loan code</span>
+        <span class="value">${code}</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Sent to</span>
+        <span class="value">${borrower.slice(0,8)}...${borrower.slice(-6)}</span>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text-dim);margin:12px 0;">Share this link with your friend so they can accept the loan:</p>
+    <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:12px;font-family:monospace;word-break:break-all;margin-bottom:12px;color:var(--accent);">${url}</div>
+    <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:8px;" onclick="navigator.clipboard.writeText('${url}');toast('Link copied!')">📋 Copy Link</button>
+    <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="shareLoanMsg(this, '${encodeURIComponent(msg)}')">📤 Share via Message</button>
+  `
+  const createScreen = document.getElementById('screen-create')
+  const existing = document.getElementById('share-info')
+  if (existing) existing.remove()
+  shareContent.id = 'share-info'
+  createScreen.insertBefore(shareContent, document.getElementById('create-btn'))
+}
+
+function shareLoanMsg(btn, msg) {
+  const decoded = decodeURIComponent(msg)
+  if (navigator.share) {
+    navigator.share({ text: decoded })
+  } else {
+    navigator.clipboard.writeText(decoded).then(() => toast('Copied — paste it in your message!'))
+  }
+}
+
+// ---- Accept Loan Screen ----
+async function showAcceptScreen(loanCode) {
+  // Check localStorage first
+  const loans = getLoans()
+  const localLoan = loans.find(l => l.code === loanCode)
+
+  const content = document.getElementById('accept-content')
+
+  if (localLoan && localLoan.borrowerAddress === wallet.address) {
+    // This is a loan the user already has locally
+    content.innerHTML = `
+      <div class="card loan-detail-card">
+        <div class="card-title">Existing Loan</div>
+        <div class="detail-row">
+          <span class="detail-label">From</span>
+          <span class="detail-value">${localLoan.lenderAddress.slice(0,8)}...${localLoan.lenderAddress.slice(-6)}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Amount</span>
+          <span class="detail-value">${localLoan.amount} RLUSD</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Fee</span>
+          <span class="detail-value">${localLoan.feePercent}%</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Due</span>
+          <span class="detail-value">${new Date(localLoan.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status</span>
+          <span class="detail-value"><span class="badge badge-${localLoan.status}">${localLoan.status.toUpperCase()}</span></span>
+        </div>
+        ${localLoan.status === 'sent' ? `
+          <div style="margin-top:20px;">
+            <button class="btn btn-green" onclick="acceptLocalLoan('${loanCode}','${localLoan.totalRepay}','${localLoan.lenderAddress}','${localLoan.amount}')">
+              ✅ Accept Loan
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    `
+    return
+  }
+
+  // Check if the user is the intended borrower by scanning their transactions for the memo
+  try {
+    const txData = await xrpl('account_tx', {
+      account: wallet.address,
+      ledger_index_min: -1,
+      ledger_index_max: -1,
+      limit: 50,
+      forward: false
+    })
+
+    let foundLoan = null
+    for (const entry of (txData.transactions || [])) {
+      const tx = entry.tx
+      if (tx.TransactionType !== 'Payment') continue
+      if (!tx.Memos) continue
+
+      for (const memo of tx.Memos) {
+        try {
+          const data = JSON.parse(atob(memo.Memo.MemoData))
+          if (data.type === 'faiva_loan' && data.code === loanCode) {
+            foundLoan = {
+              code: data.code,
+              lenderAddress: data.lender,
+              borrowerAddress: data.borrower,
+              amount: data.amount,
+              feePercent: data.feePercent,
+              feeAmount: data.feeAmount,
+              totalRepay: data.totalRepay,
+              dueDate: data.dueDate,
+              createdAt: new Date().toISOString(),
+              status: 'sent',
+              txHash: tx.hash || '',
+              acceptUrl: window.location.href
+            }
+            break
+          }
+        } catch {}
+      }
+      if (foundLoan) break
+    }
+
+    if (foundLoan) {
+      if (foundLoan.borrowerAddress !== wallet.address) {
+        content.innerHTML = `<div class="card"><p style="color:var(--red);text-align:center;">This loan is intended for a different wallet.</p></div>`
+        return
+      }
+      // Save it locally
+      addLoan(foundLoan)
+      content.innerHTML = `
+        <div class="card loan-detail-card">
+          <div class="card-title">Loan Offer Found ✅</div>
+          <div class="detail-row">
+            <span class="detail-label">From</span>
+            <span class="detail-value">${foundLoan.lenderAddress.slice(0,8)}...${foundLoan.lenderAddress.slice(-6)}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Amount</span>
+            <span class="detail-value big">${foundLoan.amount} RLUSD</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Fee</span>
+            <span class="detail-value">${foundLoan.feePercent}% (${foundLoan.feeAmount} RLUSD)</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Total to repay</span>
+            <span class="detail-value big">${foundLoan.totalRepay} RLUSD</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Due date</span>
+            <span class="detail-value">${new Date(foundLoan.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+          <div style="margin-top:20px;">
+            <button class="btn btn-green" onclick="acceptLocalLoan('${loanCode}','${foundLoan.totalRepay}','${foundLoan.lenderAddress}','${foundLoan.amount}')">
+              ✅ Accept Loan
+            </button>
+          </div>
+        </div>
+      `
+    } else {
+      content.innerHTML = `
+        <div class="card">
+          <div class="empty-state">
+            <div class="icon">🔍</div>
+            <p>Could not find loan <strong>${loanCode}</strong> on this wallet.<br><br>
+            Make sure you're using the correct wallet that was sent the loan.</p>
+          </div>
+        </div>
+      `
+    }
+  } catch (err) {
+    content.innerHTML = `<div class="card"><p style="color:var(--red);text-align:center;">Failed to load loan details. Try refreshing.</p></div>`
+  }
+}
+
+// ---- Accept Local Loan ----
+async function acceptLocalLoan(code, totalRepay, lenderAddress, amount) {
+  const content = document.getElementById('accept-content')
+  content.innerHTML = `
+    <div class="card">
+      <div style="text-align:center;padding:20px;">
+        <div class="spinner" style="margin:0 auto 16px;"></div>
+        <p style="color:var(--text-dim);">Accepting loan...</p>
+      </div>
+    </div>
+  `
+
+  try {
+    // Mark as accepted (RLUSD is already in borrower's wallet from the lender's Payment)
+    updateLoan(code, { status: 'active' })
+
+    // Clean URL
+    const cleanUrl = window.location.pathname
+    window.history.replaceState({}, '', cleanUrl)
+
+    toast('Loan accepted! You can repay anytime.')
+    showScreen('loans')
+  } catch (err) {
+    content.innerHTML = `<div class="card"><p style="color:var(--red);text-align:center;">Failed to accept: ${err.message}</p></div>`
+  }
+}
+
+// ---- Load Loans ----
+function loadLoans() {
+  if (!wallet) return
+  const list = document.getElementById('loans-list')
+  const loans = getLoans()
+
+  const filtered = loans.filter(l => {
+    const isLender = l.lenderAddress === wallet.address
+    const isBorrower = l.borrowerAddress === wallet.address
+
+    if (currentTab === 'active') {
+      return (isBorrower && l.status === 'active') || (isLender && (l.status === 'sent' || l.status === 'active'))
+    }
+    if (currentTab === 'sent') {
+      return isLender && l.status === 'sent'
+    }
+    if (currentTab === 'repaid') {
+      return l.status === 'repaid'
+    }
+    return true
+  })
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No ${currentTab} loans yet</p></div>`
+    return
+  }
+
+  list.innerHTML = filtered.map(loan => {
+    const isLender = loan.lenderAddress === wallet.address
+    const otherParty = isLender ? loan.borrowerAddress : loan.lenderAddress
+    const due = new Date(loan.dueDate)
+    const isOverdue = new Date() > due && loan.status !== 'repaid'
+    const statusClass = isOverdue ? 'overdue' : loan.status
+    const dueStr = due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
+    let actions = ''
+    if (!isLender && loan.status === 'active') {
+      actions = `<button class="btn btn-green btn-sm" onclick="repayLoan('${loan.code}','${loan.totalRepay}','${loan.lenderAddress}')">💸 Repay ${loan.totalRepay} RLUSD</button>`
+    } else if (!isLender && loan.status === 'sent') {
+      actions = `<button class="btn btn-green btn-sm" onclick="acceptLocalLoan('${loan.code}','${loan.totalRepay}','${loan.lenderAddress}','${loan.amount}')">✅ Accept Loan</button>`
+    } else if (isLender && loan.status === 'sent') {
+      actions = `
+        <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('${loan.acceptUrl}');toast('Link copied!')">📋 Copy Link</button>
+      `
+    }
+
+    return `
+      <div class="loan-item">
+        <div class="loan-item-header">
+          <div class="loan-item-amount">${loan.amount} <small>RLUSD</small></div>
+          <span class="badge badge-${statusClass}">${isOverdue ? 'OVERDUE' : loan.status.toUpperCase()}</span>
+        </div>
+        <div class="loan-item-details">
+          <span>👤 ${otherParty.slice(0,8)}...${otherParty.slice(-6)}</span>
+          <span>📅 Due ${dueStr}</span>
+          <span>💰 Fee: ${loan.feePercent}%</span>
+        </div>
+        ${actions ? `<div class="loan-item-actions">${actions}</div>` : ''}
+      </div>
+    `
+  }).join('')
+}
+
+function switchTab(tab) {
+  currentTab = tab
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab))
+  loadLoans()
+}
+
+// ---- Repay ----
+async function repayLoan(loanCode, totalRepay, lenderAddress) {
+  const confirmMsg = `Repay ${totalRepay} RLUSD to ${lenderAddress.slice(0,8)}...${lenderAddress.slice(-6)}?`
+  if (!confirm(confirmMsg)) return
+
+  try {
+    const { Wallet, Client } = xrpl
+    const client = new Client('wss://rpc.xrplclaw.com/ws')
+    await client.connect()
+
+    const w = Wallet.fromSeed(wallet.seed)
+    const tx = {
+      TransactionType: 'Payment',
+      Account: wallet.address,
+      Destination: lenderAddress,
+      Amount: {
+        currency: RLUSD_CURRENCY,
+        issuer: RLUSD_ISSUER,
+        value: totalRepay
+      },
+      Memos: [{
+        Memo: {
+          MemoData: btoa(JSON.stringify({ type: 'faiva_repay', loanCode }))
+        }
+      }]
+    }
+
+    const prepared = await client.autofill(tx)
+    const signed = w.sign(prepared)
+    const result = await client.submitAndWait(signed.tx_blob)
+    await client.disconnect()
+
+    if (result.result.meta.TransactionResult !== 'tesSUCCESS') {
+      throw new Error('Transaction failed: ' + result.result.meta.TransactionResult)
+    }
+
+    updateLoan(loanCode, { status: 'repaid', repayTxHash: result.result.hash || '' })
+
+    toast('Loan repaid! 🎉')
+    loadLoans()
+  } catch (err) {
+    showError('Failed to repay: ' + err.message)
+  }
+}
+
+// ---- Reminders ----
+function loadReminders() {
+  if (!wallet) return
+  const list = document.getElementById('reminders-list')
+  const loans = getLoans().filter(l => l.status !== 'repaid')
+
+  const relevantLoans = loans.filter(l => {
+    return l.lenderAddress === wallet.address || l.borrowerAddress === wallet.address
+  })
+
+  if (relevantLoans.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🔕</div><p>No active loans needing reminders</p></div>'
+    return
+  }
+
+  list.innerHTML = relevantLoans.map(loan => {
+    const isLender = loan.lenderAddress === wallet.address
+    const borrower = loan.borrowerAddress.slice(0, 8) + '...' + loan.borrowerAddress.slice(-6)
+    const due = new Date(loan.dueDate)
+    const daysLeft = Math.ceil((due - new Date()) / (1000 * 60 * 60 * 24))
+    const dueStr = due.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+
+    const reminderText = isLender
+      ? `Hey! Just a friendly reminder about the ${loan.amount} RLUSD I lent you via FaiVa. You owe ${loan.totalRepay} RLUSD (includes ${loan.feePercent}% fee). Due: ${dueStr}. Thanks! 🐑`
+      : `Friendly reminder: you owe ${loan.totalRepay} RLUSD to your friend via FaiVa. Due: ${dueStr}. Let them know when you're ready to repay! 🐑`
+
+    return `
+      <div class="reminder-card">
+        <div class="reminder-text">${reminderText}</div>
+        <div class="reminder-actions">
+          <button class="btn btn-secondary btn-sm" onclick="copyReminder(this)">📋 Copy</button>
+          <button class="btn btn-secondary btn-sm" onclick="shareReminder('${encodeURIComponent(reminderText)}')">📤 Share</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">
+          ${isLender ? `To: ${borrower}` : `To: lender`} · ${daysLeft > 0 ? daysLeft + ' days remaining' : '⚠️ Past due'}
+        </div>
+      </div>
+    `
+  }).join('')
+}
+
+function copyReminder(btn) {
+  const text = btn.closest('.reminder-card').querySelector('.reminder-text').textContent
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard!'))
+}
+
+function shareReminder(text) {
+  const decoded = decodeURIComponent(text)
+  if (navigator.share) {
+    navigator.share({ text: decoded })
+  } else {
+    navigator.clipboard.writeText(decoded).then(() => toast('Copied — paste it in your message!'))
+  }
+}
+
+// ---- Init ----
+document.getElementById('seed-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') connectWallet()
+})
+
+const today = new Date()
+const minDate = new Date(today)
+minDate.setDate(minDate.getDate() + 1)
+document.getElementById('due-date-input').min = minDate.toISOString().split('T')[0]
+const maxDate = new Date(today)
+maxDate.setDate(maxDate.getDate() + 90)
+document.getElementById('due-date-input').max = maxDate.toISOString().split('T')[0]
+
+// Check if we came from an accept link
+const params = new URLSearchParams(window.location.search)
+if (params.get('loan')) {
+  // We'll handle this after wallet connection
+}
+</script>
+</body>
+</html>
