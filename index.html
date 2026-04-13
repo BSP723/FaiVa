@@ -710,16 +710,7 @@ async function connectWallet() {
       if (addr) { await onWalletConnected(addr); return }
     }
 
-    // Register handlers BEFORE connect
-    wcProvider.on('display_uri', async (uri) => {
-      QRCode.toCanvas(document.getElementById('qr-canvas'), uri, {
-        width: 240, margin: 2,
-        color: { dark: '#0a0a0f', light: '#ffffff' }
-      }, (err) => { if (err) console.error('QR error:', err) })
-      document.getElementById('qr-overlay').classList.add('show')
-      document.getElementById('qr-status').textContent = 'Waiting for you to scan...'
-    })
-
+    // Register session handlers
     wcProvider.on('connect', ({ session }) => {
       const addr = extractAddress(session)
       if (addr) onWalletConnected(addr)
@@ -731,8 +722,21 @@ async function connectWallet() {
 
     btn.innerHTML = '<span class="spinner"></span> Generating QR...'
 
-    // Connect
+    // Manually create pairing to get the URI directly
+    // (display_uri event is unreliable with UniversalProvider)
+    const { uri, pairingTopic } = await wcProvider.client.core.pairing.create()
+
+    // Show QR code immediately
+    QRCode.toCanvas(document.getElementById('qr-canvas'), uri, {
+      width: 240, margin: 2,
+      color: { dark: '#0a0a0f', light: '#ffffff' }
+    }, (err) => { if (err) console.error('QR error:', err) })
+    document.getElementById('qr-overlay').classList.add('show')
+    document.getElementById('qr-status').textContent = 'Waiting for you to scan...'
+
+    // Now connect — this will use the pairing we just created
     await wcProvider.connect({
+      pairingTopic,
       namespaces: {
         xrpl: {
           methods: ['xrpl_signTransaction'],
@@ -744,7 +748,7 @@ async function connectWallet() {
 
   } catch (err) {
     console.error('[Connect] Error:', err)
-    showError('Failed to connect. Make sure you have Joey Wallet installed, then try again.')
+    showError('Failed to connect: ' + err.message)
     btn.disabled = false
     btn.innerHTML = '<span class="icon">🦘</span> Connect via Joey Wallet'
   }
