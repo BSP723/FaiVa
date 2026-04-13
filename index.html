@@ -6,7 +6,15 @@
 <title>FaiVa — Friend-to-Friend Lending</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/xrpl@4.0.0/build/xrpl-latest-min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "@walletconnect/universal-provider": "https://esm.sh/@walletconnect/universal-provider@2.17.0",
+    "@walletconnect/utils": "https://esm.sh/@walletconnect/utils@2.17.0",
+    "qrcode": "https://esm.sh/qrcode@1.5.4"
+  }
+}
+</script>
 <style>
 :root {
   --bg: #0a0a0f;
@@ -23,6 +31,7 @@
   --red-bg: rgba(239, 68, 68, 0.1);
   --amber: #f59e0b;
   --amber-bg: rgba(245, 158, 11, 0.1);
+  --orange: #E8651A;
   --radius: 14px;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -67,31 +76,62 @@ body {
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
 /* Connect Screen */
-.connect-screen { text-align: center; padding-top: 60px; }
+.connect-screen { text-align: center; padding-top: 40px; }
 .connect-screen h2 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
 .connect-screen p { color: var(--text-dim); font-size: 14px; line-height: 1.6; margin-bottom: 32px; }
-.connect-input-wrap {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 4px; margin-bottom: 16px; display: flex; align-items: center;
+
+/* Wallet buttons */
+.wallet-btn {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px;
+  cursor: pointer; transition: all 0.2s; font-family: inherit;
 }
-.connect-input-wrap input {
-  flex: 1; background: none; border: none; padding: 14px 12px;
-  color: var(--text); font-size: 14px; font-family: 'JetBrains Mono', monospace;
-  outline: none;
+.wallet-btn:hover { border-color: var(--accent); background: var(--surface2); }
+.wallet-btn:active { transform: scale(0.98); }
+.wallet-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.wallet-btn .wallet-logo {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
 }
-.connect-input-wrap input::placeholder { color: var(--text-dim); }
-.connect-input-wrap button {
-  background: var(--accent); border: none; color: white;
-  padding: 12px 20px; border-radius: 10px; font-weight: 600;
-  font-size: 14px; cursor: pointer; white-space: nowrap;
-}
-.connect-input-wrap button:disabled { opacity: 0.5; cursor: not-allowed; }
-.connect-hint { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+.wallet-btn .wallet-logo.joey { background: var(--orange); color: white; }
+.wallet-btn .wallet-logo.xaman { background: #2B2D42; color: white; }
+.wallet-btn .wallet-info { text-align: left; flex: 1; }
+.wallet-btn .wallet-name { font-size: 16px; font-weight: 700; }
+.wallet-btn .wallet-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.wallet-btn .wallet-arrow { font-size: 18px; color: var(--text-dim); }
+
+.connect-hint { font-size: 12px; color: var(--text-dim); margin-top: 16px; line-height: 1.5; }
 .connect-warn {
   margin-top: 24px; padding: 12px 16px; border-radius: 10px;
   background: var(--amber-bg); border: 1px solid rgba(245,158,11,0.2);
   font-size: 12px; color: var(--amber); text-align: left; line-height: 1.5;
 }
+
+/* QR Modal */
+.qr-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+}
+.qr-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+.qr-modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px 24px; max-width: 360px;
+  width: 90%; text-align: center;
+}
+.qr-modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.qr-modal p { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; line-height: 1.5; }
+.qr-canvas { margin: 0 auto 20px; border-radius: 12px; background: white; padding: 12px; }
+.qr-close {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 24px; border-radius: 10px;
+  font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit;
+}
+.qr-close:hover { background: var(--border); }
+.qr-status { font-size: 12px; color: var(--text-dim); margin-top: 12px; }
+.qr-status .spinner { display: inline-block; vertical-align: middle; }
 
 /* Error / Status */
 .error-banner {
@@ -282,7 +322,7 @@ input[type="range"]::-moz-range-thumb {
   font-size: 12px;
 }
 .wallet-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-.wallet-addr { font-family: 'JetBrains Mono', monospace; color: var(--text-dim); }
+.wallet-addr { font-family: monospace; color: var(--text-dim); }
 .wallet-bsp { margin-left: auto; font-weight: 600; color: var(--accent); }
 .wallet-disconnect {
   background: none; border: none; color: var(--text-dim); cursor: pointer;
@@ -306,6 +346,14 @@ input[type="range"]::-moz-range-thumb {
 .accept-loan .detail-label { color: var(--text-dim); }
 .accept-loan .detail-value { font-weight: 600; }
 .accept-loan .detail-value.big { font-size: 22px; font-weight: 700; color: var(--accent); }
+
+/* BSP gate message */
+.bsp-gate {
+  text-align: center; padding: 40px 20px;
+}
+.bsp-gate .icon { font-size: 48px; margin-bottom: 16px; }
+.bsp-gate h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.bsp-gate p { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
 
 /* Responsive tweaks */
 @media (min-width: 500px) {
@@ -331,14 +379,28 @@ input[type="range"]::-moz-range-thumb {
   <!-- SCREEN: Connect -->
   <div id="screen-connect" class="screen active">
     <div class="connect-screen">
-      <h2>Connect your XRPL wallet</h2>
-      <p>FaiVa lets you lend RLUSD to friends — no banks, no interest, just trust. Enter your wallet seed to get started.</p>
-      <div class="connect-input-wrap">
-        <input type="password" id="seed-input" placeholder="sEd... or secret" autocomplete="off" spellcheck="false">
-        <button id="connect-btn" onclick="connectWallet()">Connect</button>
-      </div>
-      <div class="connect-hint">Your seed is used only in your browser — never sent to any server.</div>
-      <div class="connect-warn">⚠️ This is a hot wallet connection. Never share your seed publicly. For significant funds, use a hardware wallet or Xaman app.</div>
+      <h2>Connect your wallet</h2>
+      <p>Sign with your XRPL wallet to access FaiVa. Your wallet never leaves your device — we just verify you hold BSP.</p>
+
+      <button class="wallet-btn" id="joey-btn" onclick="connectJoey()">
+        <div class="wallet-logo joey">🦘</div>
+        <div class="wallet-info">
+          <div class="wallet-name">Joey Wallet</div>
+          <div class="wallet-desc">Social login · No seed phrase · Mobile</div>
+        </div>
+        <div class="wallet-arrow">→</div>
+      </button>
+
+      <button class="wallet-btn" id="xaman-btn" onclick="connectXaman()">
+        <div class="wallet-logo xaman">🦊</div>
+        <div class="wallet-info">
+          <div class="wallet-name">Xaman</div>
+          <div class="wallet-desc">QR code · Scan with your phone</div>
+        </div>
+        <div class="wallet-arrow">→</div>
+      </button>
+
+      <div class="connect-hint">Don't have a wallet? Download <a href="https://joeywallet.xyz" target="_blank" style="color:var(--accent);">Joey Wallet</a> (iOS/Android) — sign in with Google or Apple in 5 seconds.</div>
     </div>
   </div>
 
@@ -460,16 +522,49 @@ input[type="range"]::-moz-range-thumb {
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 
-<script>
+<!-- QR Modal -->
+<div class="qr-overlay" id="qr-overlay">
+  <div class="qr-modal">
+    <h3 id="qr-title">Scan with Joey Wallet</h3>
+    <p id="qr-desc">Open Joey Wallet on your phone and scan this QR code to connect.</p>
+    <canvas id="qr-canvas" class="qr-canvas" width="240" height="240"></canvas>
+    <button class="qr-close" onclick="closeQR()">Cancel</button>
+    <div class="qr-status" id="qr-status">Waiting for connection...</div>
+  </div>
+</div>
+
+<script type="module">
 // ---- Configuration ----
 const XRPL_RPC = 'https://rpc.xrplclaw.com'
 const BSP_ISSUER = 'rG47hi9xKvEhjCD8LXhfxjRzuEEBxwGUbL'
 const RLUSD_ISSUER = 'rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De'
 const RLUSD_CURRENCY = '524C555344000000000000000000000000000000'
+const JOEY_WC_PROJECT_ID = '4ccb49eb5593c8ddca751c979f9c7ccc'
+const JOEY_WALLET_ID = 'd9f5432e932c6fad8e19a0cea9d4a3372a84aed16e98a52e6655dd2821a63404'
 
 // ---- State ----
-let wallet = null // { seed, address, bspBalance }
+let wallet = null // { address, bspBalance, provider, sessionTopic }
 let currentTab = 'active'
+let wcProvider = null
+
+// ---- Expose to global for onclick handlers ----
+window.connectJoey = connectJoey
+window.connectXaman = connectXaman
+window.disconnectWallet = disconnectWallet
+window.showScreen = showScreen
+window.switchTab = switchTab
+window.updateSummary = updateSummary
+window.setDueDate = setDueDate
+window.createLoan = createLoan
+window.repayLoan = repayLoan
+window.copyReminder = copyReminder
+window.shareReminder = shareReminder
+window.closeQR = closeQR
+window.acceptLocalLoan = acceptLocalLoan
+
+// ---- Environment Detection ----
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+const isInAppBrowser = isMobile && !/Safari\//i.test(navigator.userAgent) && !/Chrome\//i.test(navigator.userAgent)
 
 // ---- XRPL RPC Helper ----
 async function xrpl(method, params) {
@@ -483,6 +578,20 @@ async function xrpl(method, params) {
   return data.result
 }
 
+// ---- Autofill Helper (needed for Joey signing) ----
+async function getAutofillFields(account) {
+  const [acctRes, feeRes, ledgerRes] = await Promise.all([
+    xrpl('account_info', { account, ledger_index: 'current' }),
+    xrpl('fee'),
+    xrpl('ledger_current')
+  ])
+  return {
+    Sequence: acctRes.account_data.Sequence,
+    Fee: String(Math.max(Number(feeRes.drops.open_ledger_fee || '12'), 12)),
+    LastLedgerSequence: ledgerRes.ledger_current_index + 20
+  }
+}
+
 // ---- Toast ----
 function toast(msg) {
   const el = document.getElementById('toast')
@@ -490,6 +599,7 @@ function toast(msg) {
   el.classList.add('show')
   setTimeout(() => el.classList.remove('show'), 3000)
 }
+window.toast = toast
 
 // ---- Error ----
 function showError(msg) {
@@ -498,17 +608,20 @@ function showError(msg) {
   el.classList.add('show')
   setTimeout(() => el.classList.remove('show'), 8000)
 }
+window.showError = showError
 
 // ---- Screens ----
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
-  document.getElementById('screen-' + name).classList.add('active')
+  const target = document.getElementById('screen-' + name)
+  if (target) target.classList.add('active')
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.screen === name)
   })
   if (name === 'loans') loadLoans()
   if (name === 'reminders') loadReminders()
 }
+window.showScreen = showScreen
 
 // ---- Local Storage: Loans ----
 function getLoans() {
@@ -537,22 +650,123 @@ function generateLoanCode() {
   return code
 }
 
-// ---- Connect Wallet ----
-async function connectWallet() {
-  const seed = document.getElementById('seed-input').value.trim()
-  if (!seed) { showError('Please enter your wallet seed.'); return; }
+// ---- Close QR ----
+function closeQR() {
+  document.getElementById('qr-overlay').classList.remove('show')
+}
 
-  const btn = document.getElementById('connect-btn')
+// ---- Connect Joey Wallet ----
+async function connectJoey() {
+  const btn = document.getElementById('joey-btn')
   btn.disabled = true
-  btn.innerHTML = '<span class="spinner"></span>'
+  btn.querySelector('.wallet-arrow').innerHTML = '<span class="spinner"></span>'
 
   try {
-    const { Wallet } = xrpl
-    const w = Wallet.fromSeed(seed)
+    const { default: UniversalProvider } = await import('@walletconnect/universal-provider')
+    const QRCode = (await import('qrcode')).default
+
+    wcProvider = await UniversalProvider.init({
+      projectId: JOEY_WC_PROJECT_ID,
+      metadata: {
+        name: 'FaiVa',
+        description: 'Friend-to-friend RLUSD lending',
+        url: window.location.origin,
+        icons: []
+      }
+    })
+
+    // Check for existing session
+    if (wcProvider.session) {
+      const addr = extractAddress(wcProvider.session)
+      if (addr) {
+        await onWalletConnected(addr, 'Joey')
+        return
+      }
+    }
+
+    // Register handlers BEFORE connect
+    wcProvider.on('connect', ({ session }) => {
+      const addr = extractAddress(session)
+      if (addr) onWalletConnected(addr, 'Joey')
+    })
+    wcProvider.on('display_uri', (uri) => {
+      // Show QR modal
+      QRCode.toCanvas(document.getElementById('qr-canvas'), uri, { width: 240, margin: 2, color: { dark: '#000000', light: '#ffffff' } }, (err) => {
+        if (err) console.error('QR error:', err)
+      })
+      document.getElementById('qr-overlay').classList.add('show')
+    })
+    wcProvider.on('disconnect', () => {
+      if (wallet) {
+        toast('Wallet disconnected')
+        disconnectWallet()
+      }
+    })
+
+    // Start connect
+    wcProvider.connect({
+      namespaces: {
+        xrpl: {
+          methods: ['xrpl_signTransaction'],
+          chains: ['xrpl:0'],
+          events: ['chainChanged', 'accountsChanged']
+        }
+      }
+    }).catch(err => {
+      console.error('[Joey] Connect error:', err)
+      showError('Failed to connect. Try again or use Xaman.')
+      btn.disabled = false
+      btn.querySelector('.wallet-arrow').textContent = '→'
+    })
+
+  } catch (err) {
+    console.error('[Joey] Init error:', err)
+    showError('Failed to initialize wallet connection.')
+    btn.disabled = false
+    btn.querySelector('.wallet-arrow').textContent = '→'
+  }
+}
+
+// ---- Connect Xaman ----
+async function connectXaman() {
+  const btn = document.getElementById('xaman-btn')
+  btn.disabled = true
+  btn.querySelector('.wallet-arrow').innerHTML = '<span class="spinner"></span>'
+
+  try {
+    // Load Xaman Universal SDK from CDN
+    if (!window.Xumm) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script')
+        s.src = 'https://xumm.app/assets/cdn/xumm.min.js'
+        s.onload = resolve
+        s.onerror = reject
+        document.head.appendChild(s)
+      })
+    }
+
+    const xumm = new window.Xumm('pub_key_placeholder') // API key needed for full Xaman integration
+    // For now, show a message since we need an API key for Xaman
+    showError('Xaman requires an API key. For now, please use Joey Wallet. If you have a Xaman API key, let me know and I\'ll add it.')
+    btn.disabled = false
+    btn.querySelector('.wallet-arrow').textContent = '→'
+
+  } catch (err) {
+    showError('Failed to connect Xaman.')
+    btn.disabled = false
+    btn.querySelector('.wallet-arrow').textContent = '→'
+  }
+}
+
+// ---- On Wallet Connected ----
+async function onWalletConnected(address, walletName) {
+  try {
+    // Close QR if open
+    document.getElementById('qr-overlay').classList.remove('show')
 
     // Check BSP balance
     const lines = await xrpl('account_lines', {
-      account: w.address,
+      account: address,
       ledger_index: 'validated'
     })
     const bspLine = lines.lines?.find(l => l.currency === 'BSP' && l.account === BSP_ISSUER)
@@ -560,16 +774,14 @@ async function connectWallet() {
 
     if (bspBal <= 0) {
       showError('You need to hold BSP tokens to access FaiVa. Get some BSP to continue.')
-      btn.disabled = false
-      btn.textContent = 'Connect'
       return
     }
 
-    wallet = { seed, address: w.address, bspBalance: bspBal }
+    wallet = { address, bspBalance: bspBal, name: walletName }
 
     // Show wallet bar
     document.getElementById('wallet-bar').style.display = 'flex'
-    document.getElementById('wallet-addr').textContent = w.address.slice(0, 8) + '...' + w.address.slice(-6)
+    document.getElementById('wallet-addr').textContent = address.slice(0, 8) + '...' + address.slice(-6)
     document.getElementById('wallet-bsp').textContent = bspBal.toFixed(2) + ' BSP'
 
     // Set min date
@@ -586,22 +798,33 @@ async function connectWallet() {
       showScreen('create')
     }
     document.getElementById('bottom-nav').style.display = 'flex'
-    toast('Connected! BSP balance: ' + bspBal.toFixed(2))
-  } catch (err) {
-    showError('Failed to connect: ' + err.message)
-  }
+    toast('Connected via ' + walletName + '! BSP: ' + bspBal.toFixed(2))
 
-  btn.disabled = false
-  btn.textContent = 'Connect'
+  } catch (err) {
+    showError('Failed to verify wallet: ' + err.message)
+  }
 }
 
+// ---- Disconnect ----
 function disconnectWallet() {
   wallet = null
-  document.getElementById('seed-input').value = ''
+  if (wcProvider) {
+    wcProvider.disconnect().catch(() => {})
+    wcProvider = null
+  }
   document.getElementById('wallet-bar').style.display = 'none'
   document.getElementById('bottom-nav').style.display = 'none'
   showScreen('connect')
   toast('Disconnected')
+}
+
+// ---- Extract Address from WC Session ----
+function extractAddress(session) {
+  for (const key of Object.keys(session?.namespaces ?? {})) {
+    const accs = session.namespaces[key]?.accounts
+    if (accs?.length) return accs[0].split(':').pop()
+  }
+  return null
 }
 
 // ---- Summary ----
@@ -637,6 +860,8 @@ function setDueDate(days) {
 
 // ---- Create Loan ----
 async function createLoan() {
+  if (!wallet) { showError('Please connect your wallet first.'); return; }
+
   const borrower = document.getElementById('borrower-input').value.trim()
   const amount = parseFloat(document.getElementById('amount-input').value)
   const fee = parseFloat(document.getElementById('fee-slider').value)
@@ -651,23 +876,28 @@ async function createLoan() {
 
   const btn = document.getElementById('create-btn')
   btn.disabled = true
-  btn.innerHTML = '<span class="spinner"></span> Sending RLUSD...'
+  btn.innerHTML = '<span class="spinner"></span> Preparing...'
 
   try {
     const feeAmt = (amount * fee / 100).toFixed(2)
     const totalRepay = (amount + parseFloat(feeAmt)).toFixed(2)
     const loanCode = generateLoanCode()
 
-    // Send RLUSD to borrower
+    // Build the transaction
+    const autofill = await getAutofillFields(wallet.address)
     const tx = {
       TransactionType: 'Payment',
       Account: wallet.address,
       Destination: borrower,
       Amount: {
         currency: RLUSD_CURRENCY,
-        issuer: RLUSD_ISSUER,
-        value: amount.toFixed(2)
+        value: amount.toFixed(2),
+        issuer: RLUSD_ISSUER
       },
+      Fee: autofill.Fee,
+      Sequence: autofill.Sequence,
+      LastLedgerSequence: autofill.LastLedgerSequence,
+      Flags: 0,
       Memos: [{
         Memo: {
           MemoData: btoa(JSON.stringify({
@@ -685,54 +915,52 @@ async function createLoan() {
       }]
     }
 
-    const { Wallet, Client } = xrpl
-    const client = new Client('wss://rpc.xrplclaw.com/ws')
-    await client.connect()
+    btn.innerHTML = '<span class="spinner"></span> Requesting signature...'
 
-    const w = Wallet.fromSeed(wallet.seed)
-    const prepared = await client.autofill(tx)
-    const signed = w.sign(prepared)
-    const result = await client.submitAndWait(signed.tx_blob)
-    await client.disconnect()
+    // Sign via WalletConnect
+    const signResult = await wcProvider.request({
+      method: 'xrpl_signTransaction',
+      params: { tx_blob: null, tx_json: tx }
+    }, 'xrpl:0')
 
-    if (result.result.meta.TransactionResult !== 'tesSUCCESS') {
-      throw new Error('Transaction failed: ' + result.result.meta.TransactionResult)
+    // If we got here, the transaction was signed and submitted
+    if (signResult && (signResult.tx_blob || signResult.result?.meta)) {
+      const txHash = signResult.tx_hash || signResult.result?.hash || signResult.meta?.TransactionHash
+
+      addLoan({
+        code: loanCode,
+        lenderAddress: wallet.address,
+        borrowerAddress: borrower,
+        amount: amount.toFixed(2),
+        feePercent: fee,
+        feeAmount: feeAmt,
+        totalRepay: totalRepay,
+        dueDate: due,
+        createdAt: new Date().toISOString(),
+        status: 'sent',
+        txHash: txHash || '',
+        acceptUrl: window.location.origin + window.location.pathname + '?loan=' + loanCode
+      })
+
+      toast('Loan sent! Code: ' + loanCode)
+
+      // Reset form
+      document.getElementById('borrower-input').value = ''
+      document.getElementById('amount-input').value = ''
+      document.getElementById('due-date-input').value = ''
+      document.getElementById('fee-slider').value = 5
+      updateSummary()
+
+      showLoanShare(loanCode, window.location.origin + window.location.pathname + '?loan=' + loanCode, borrower, totalRepay)
     }
-
-    // Generate accept link
-    const baseUrl = window.location.origin + window.location.pathname
-    const acceptUrl = `${baseUrl}?loan=${loanCode}`
-
-    // Save loan locally
-    addLoan({
-      code: loanCode,
-      lenderAddress: wallet.address,
-      borrowerAddress: borrower,
-      amount: amount.toFixed(2),
-      feePercent: fee,
-      feeAmount: feeAmt,
-      totalRepay: totalRepay,
-      dueDate: due,
-      createdAt: new Date().toISOString(),
-      status: 'sent',
-      txHash: result.result.hash || '',
-      acceptUrl: acceptUrl
-    })
-
-    toast('Loan sent! Code: ' + loanCode)
-
-    // Reset form
-    document.getElementById('borrower-input').value = ''
-    document.getElementById('amount-input').value = ''
-    document.getElementById('due-date-input').value = ''
-    document.getElementById('fee-slider').value = 5
-    updateSummary()
-
-    // Show the share info
-    showLoanShare(loanCode, acceptUrl, borrower, totalRepay)
-
   } catch (err) {
-    showError('Failed to create loan: ' + err.message)
+    console.error('[CreateLoan] Error:', err)
+    const msg = err.message || 'Unknown error'
+    if (msg.includes('User rejected') || msg.includes('rejected')) {
+      showError('You declined the signing request. No worries — try again when ready.')
+    } else {
+      showError('Failed to create loan: ' + msg)
+    }
   }
 
   btn.disabled = false
@@ -741,7 +969,6 @@ async function createLoan() {
 
 // ---- Share loan after creation ----
 function showLoanShare(code, url, borrower, totalRepay) {
-  const msg = `I've sent you ${totalRepay} RLUSD via FaiVa! Accept it here: ${url}`
   const shareContent = document.createElement('div')
   shareContent.className = 'card'
   shareContent.innerHTML = `
@@ -759,7 +986,7 @@ function showLoanShare(code, url, borrower, totalRepay) {
     <p style="font-size:13px;color:var(--text-dim);margin:12px 0;">Share this link with your friend so they can accept the loan:</p>
     <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:12px;font-family:monospace;word-break:break-all;margin-bottom:12px;color:var(--accent);">${url}</div>
     <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:8px;" onclick="navigator.clipboard.writeText('${url}');toast('Link copied!')">📋 Copy Link</button>
-    <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="shareLoanMsg(this, '${encodeURIComponent(msg)}')">📤 Share via Message</button>
+    <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="shareLoanMsg('${encodeURIComponent('I sent you ' + totalRepay + ' RLUSD via FaiVa! Accept it here: ' + url)}')">📤 Share via Message</button>
   `
   const createScreen = document.getElementById('screen-create')
   const existing = document.getElementById('share-info')
@@ -768,7 +995,7 @@ function showLoanShare(code, url, borrower, totalRepay) {
   createScreen.insertBefore(shareContent, document.getElementById('create-btn'))
 }
 
-function shareLoanMsg(btn, msg) {
+function shareLoanMsg(msg) {
   const decoded = decodeURIComponent(msg)
   if (navigator.share) {
     navigator.share({ text: decoded })
@@ -779,50 +1006,27 @@ function shareLoanMsg(btn, msg) {
 
 // ---- Accept Loan Screen ----
 async function showAcceptScreen(loanCode) {
-  // Check localStorage first
   const loans = getLoans()
   const localLoan = loans.find(l => l.code === loanCode)
 
   const content = document.getElementById('accept-content')
 
   if (localLoan && localLoan.borrowerAddress === wallet.address) {
-    // This is a loan the user already has locally
     content.innerHTML = `
       <div class="card loan-detail-card">
         <div class="card-title">Existing Loan</div>
-        <div class="detail-row">
-          <span class="detail-label">From</span>
-          <span class="detail-value">${localLoan.lenderAddress.slice(0,8)}...${localLoan.lenderAddress.slice(-6)}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Amount</span>
-          <span class="detail-value">${localLoan.amount} RLUSD</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Fee</span>
-          <span class="detail-value">${localLoan.feePercent}%</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Due</span>
-          <span class="detail-value">${new Date(localLoan.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Status</span>
-          <span class="detail-value"><span class="badge badge-${localLoan.status}">${localLoan.status.toUpperCase()}</span></span>
-        </div>
-        ${localLoan.status === 'sent' ? `
-          <div style="margin-top:20px;">
-            <button class="btn btn-green" onclick="acceptLocalLoan('${loanCode}','${localLoan.totalRepay}','${localLoan.lenderAddress}','${localLoan.amount}')">
-              ✅ Accept Loan
-            </button>
-          </div>
-        ` : ''}
+        <div class="detail-row"><span class="detail-label">From</span><span class="detail-value">${localLoan.lenderAddress.slice(0,8)}...${localLoan.lenderAddress.slice(-6)}</span></div>
+        <div class="detail-row"><span class="detail-label">Amount</span><span class="detail-value">${localLoan.amount} RLUSD</span></div>
+        <div class="detail-row"><span class="detail-label">Fee</span><span class="detail-value">${localLoan.feePercent}%</span></div>
+        <div class="detail-row"><span class="detail-label">Due</span><span class="detail-value">${new Date(localLoan.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span></div>
+        <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="badge badge-${localLoan.status}">${localLoan.status.toUpperCase()}</span></span></div>
+        ${localLoan.status === 'sent' ? `<div style="margin-top:20px;"><button class="btn btn-green" onclick="acceptLocalLoan('${loanCode}','${localLoan.totalRepay}','${localLoan.lenderAddress}','${localLoan.amount}')">✅ Accept Loan</button></div>` : ''}
       </div>
     `
     return
   }
 
-  // Check if the user is the intended borrower by scanning their transactions for the memo
+  // Check on-chain
   try {
     const txData = await xrpl('account_tx', {
       account: wallet.address,
@@ -835,9 +1039,7 @@ async function showAcceptScreen(loanCode) {
     let foundLoan = null
     for (const entry of (txData.transactions || [])) {
       const tx = entry.tx
-      if (tx.TransactionType !== 'Payment') continue
-      if (!tx.Memos) continue
-
+      if (tx.TransactionType !== 'Payment' || !tx.Memos) continue
       for (const memo of tx.Memos) {
         try {
           const data = JSON.parse(atob(memo.Memo.MemoData))
@@ -868,48 +1070,20 @@ async function showAcceptScreen(loanCode) {
         content.innerHTML = `<div class="card"><p style="color:var(--red);text-align:center;">This loan is intended for a different wallet.</p></div>`
         return
       }
-      // Save it locally
       addLoan(foundLoan)
       content.innerHTML = `
         <div class="card loan-detail-card">
           <div class="card-title">Loan Offer Found ✅</div>
-          <div class="detail-row">
-            <span class="detail-label">From</span>
-            <span class="detail-value">${foundLoan.lenderAddress.slice(0,8)}...${foundLoan.lenderAddress.slice(-6)}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Amount</span>
-            <span class="detail-value big">${foundLoan.amount} RLUSD</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Fee</span>
-            <span class="detail-value">${foundLoan.feePercent}% (${foundLoan.feeAmount} RLUSD)</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Total to repay</span>
-            <span class="detail-value big">${foundLoan.totalRepay} RLUSD</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Due date</span>
-            <span class="detail-value">${new Date(foundLoan.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-          </div>
-          <div style="margin-top:20px;">
-            <button class="btn btn-green" onclick="acceptLocalLoan('${loanCode}','${foundLoan.totalRepay}','${foundLoan.lenderAddress}','${foundLoan.amount}')">
-              ✅ Accept Loan
-            </button>
-          </div>
+          <div class="detail-row"><span class="detail-label">From</span><span class="detail-value">${foundLoan.lenderAddress.slice(0,8)}...${foundLoan.lenderAddress.slice(-6)}</span></div>
+          <div class="detail-row"><span class="detail-label">Amount</span><span class="detail-value big">${foundLoan.amount} RLUSD</span></div>
+          <div class="detail-row"><span class="detail-label">Fee</span><span class="detail-value">${foundLoan.feePercent}% (${foundLoan.feeAmount} RLUSD)</span></div>
+          <div class="detail-row"><span class="detail-label">Total to repay</span><span class="detail-value big">${foundLoan.totalRepay} RLUSD</span></div>
+          <div class="detail-row"><span class="detail-label">Due date</span><span class="detail-value">${new Date(foundLoan.dueDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span></div>
+          <div style="margin-top:20px;"><button class="btn btn-green" onclick="acceptLocalLoan('${loanCode}','${foundLoan.totalRepay}','${foundLoan.lenderAddress}','${foundLoan.amount}')">✅ Accept Loan</button></div>
         </div>
       `
     } else {
-      content.innerHTML = `
-        <div class="card">
-          <div class="empty-state">
-            <div class="icon">🔍</div>
-            <p>Could not find loan <strong>${loanCode}</strong> on this wallet.<br><br>
-            Make sure you're using the correct wallet that was sent the loan.</p>
-          </div>
-        </div>
-      `
+      content.innerHTML = `<div class="card"><div class="empty-state"><div class="icon">🔍</div><p>Could not find loan <strong>${loanCode}</strong> on this wallet.</p></div></div>`
     }
   } catch (err) {
     content.innerHTML = `<div class="card"><p style="color:var(--red);text-align:center;">Failed to load loan details. Try refreshing.</p></div>`
@@ -917,31 +1091,14 @@ async function showAcceptScreen(loanCode) {
 }
 
 // ---- Accept Local Loan ----
-async function acceptLocalLoan(code, totalRepay, lenderAddress, amount) {
-  const content = document.getElementById('accept-content')
-  content.innerHTML = `
-    <div class="card">
-      <div style="text-align:center;padding:20px;">
-        <div class="spinner" style="margin:0 auto 16px;"></div>
-        <p style="color:var(--text-dim);">Accepting loan...</p>
-      </div>
-    </div>
-  `
-
-  try {
-    // Mark as accepted (RLUSD is already in borrower's wallet from the lender's Payment)
-    updateLoan(code, { status: 'active' })
-
-    // Clean URL
-    const cleanUrl = window.location.pathname
-    window.history.replaceState({}, '', cleanUrl)
-
-    toast('Loan accepted! You can repay anytime.')
-    showScreen('loans')
-  } catch (err) {
-    content.innerHTML = `<div class="card"><p style="color:var(--red);text-align:center;">Failed to accept: ${err.message}</p></div>`
-  }
+function acceptLocalLoan(code, totalRepay, lenderAddress, amount) {
+  updateLoan(code, { status: 'active' })
+  const cleanUrl = window.location.pathname
+  window.history.replaceState({}, '', cleanUrl)
+  toast('Loan accepted! You can repay anytime.')
+  showScreen('loans')
 }
+window.acceptLocalLoan = acceptLocalLoan
 
 // ---- Load Loans ----
 function loadLoans() {
@@ -952,16 +1109,9 @@ function loadLoans() {
   const filtered = loans.filter(l => {
     const isLender = l.lenderAddress === wallet.address
     const isBorrower = l.borrowerAddress === wallet.address
-
-    if (currentTab === 'active') {
-      return (isBorrower && l.status === 'active') || (isLender && (l.status === 'sent' || l.status === 'active'))
-    }
-    if (currentTab === 'sent') {
-      return isLender && l.status === 'sent'
-    }
-    if (currentTab === 'repaid') {
-      return l.status === 'repaid'
-    }
+    if (currentTab === 'active') return (isBorrower && l.status === 'active') || (isLender && (l.status === 'sent' || l.status === 'active'))
+    if (currentTab === 'sent') return isLender && l.status === 'sent'
+    if (currentTab === 'repaid') return l.status === 'repaid'
     return true
   })
 
@@ -984,25 +1134,10 @@ function loadLoans() {
     } else if (!isLender && loan.status === 'sent') {
       actions = `<button class="btn btn-green btn-sm" onclick="acceptLocalLoan('${loan.code}','${loan.totalRepay}','${loan.lenderAddress}','${loan.amount}')">✅ Accept Loan</button>`
     } else if (isLender && loan.status === 'sent') {
-      actions = `
-        <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('${loan.acceptUrl}');toast('Link copied!')">📋 Copy Link</button>
-      `
+      actions = `<button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('${loan.acceptUrl}');toast('Link copied!')">📋 Copy Link</button>`
     }
 
-    return `
-      <div class="loan-item">
-        <div class="loan-item-header">
-          <div class="loan-item-amount">${loan.amount} <small>RLUSD</small></div>
-          <span class="badge badge-${statusClass}">${isOverdue ? 'OVERDUE' : loan.status.toUpperCase()}</span>
-        </div>
-        <div class="loan-item-details">
-          <span>👤 ${otherParty.slice(0,8)}...${otherParty.slice(-6)}</span>
-          <span>📅 Due ${dueStr}</span>
-          <span>💰 Fee: ${loan.feePercent}%</span>
-        </div>
-        ${actions ? `<div class="loan-item-actions">${actions}</div>` : ''}
-      </div>
-    `
+    return `<div class="loan-item"><div class="loan-item-header"><div class="loan-item-amount">${loan.amount} <small>RLUSD</small></div><span class="badge badge-${statusClass}">${isOverdue ? 'OVERDUE' : loan.status.toUpperCase()}</span></div><div class="loan-item-details"><span>👤 ${otherParty.slice(0,8)}...${otherParty.slice(-6)}</span><span>📅 Due ${dueStr}</span><span>💰 Fee: ${loan.feePercent}%</span></div>${actions ? `<div class="loan-item-actions">${actions}</div>` : ''}</div>`
   }).join('')
 }
 
@@ -1014,24 +1149,23 @@ function switchTab(tab) {
 
 // ---- Repay ----
 async function repayLoan(loanCode, totalRepay, lenderAddress) {
-  const confirmMsg = `Repay ${totalRepay} RLUSD to ${lenderAddress.slice(0,8)}...${lenderAddress.slice(-6)}?`
-  if (!confirm(confirmMsg)) return
+  if (!confirm(`Repay ${totalRepay} RLUSD to ${lenderAddress.slice(0,8)}...${lenderAddress.slice(-6)}?`)) return
 
   try {
-    const { Wallet, Client } = xrpl
-    const client = new Client('wss://rpc.xrplclaw.com/ws')
-    await client.connect()
-
-    const w = Wallet.fromSeed(wallet.seed)
+    const autofill = await getAutofillFields(wallet.address)
     const tx = {
       TransactionType: 'Payment',
       Account: wallet.address,
       Destination: lenderAddress,
       Amount: {
         currency: RLUSD_CURRENCY,
-        issuer: RLUSD_ISSUER,
-        value: totalRepay
+        value: totalRepay,
+        issuer: RLUSD_ISSUER
       },
+      Fee: autofill.Fee,
+      Sequence: autofill.Sequence,
+      LastLedgerSequence: autofill.LastLedgerSequence,
+      Flags: 0,
       Memos: [{
         Memo: {
           MemoData: btoa(JSON.stringify({ type: 'faiva_repay', loanCode }))
@@ -1039,21 +1173,21 @@ async function repayLoan(loanCode, totalRepay, lenderAddress) {
       }]
     }
 
-    const prepared = await client.autofill(tx)
-    const signed = w.sign(prepared)
-    const result = await client.submitAndWait(signed.tx_blob)
-    await client.disconnect()
+    const signResult = await wcProvider.request({
+      method: 'xrpl_signTransaction',
+      params: { tx_blob: null, tx_json: tx }
+    }, 'xrpl:0')
 
-    if (result.result.meta.TransactionResult !== 'tesSUCCESS') {
-      throw new Error('Transaction failed: ' + result.result.meta.TransactionResult)
-    }
-
-    updateLoan(loanCode, { status: 'repaid', repayTxHash: result.result.hash || '' })
-
+    updateLoan(loanCode, { status: 'repaid', repayTxHash: signResult?.tx_hash || signResult?.result?.hash || '' })
     toast('Loan repaid! 🎉')
     loadLoans()
   } catch (err) {
-    showError('Failed to repay: ' + err.message)
+    const msg = err.message || 'Unknown error'
+    if (msg.includes('User rejected') || msg.includes('rejected')) {
+      showError('You declined the signing request.')
+    } else {
+      showError('Failed to repay: ' + msg)
+    }
   }
 }
 
@@ -1062,10 +1196,7 @@ function loadReminders() {
   if (!wallet) return
   const list = document.getElementById('reminders-list')
   const loans = getLoans().filter(l => l.status !== 'repaid')
-
-  const relevantLoans = loans.filter(l => {
-    return l.lenderAddress === wallet.address || l.borrowerAddress === wallet.address
-  })
+  const relevantLoans = loans.filter(l => l.lenderAddress === wallet.address || l.borrowerAddress === wallet.address)
 
   if (relevantLoans.length === 0) {
     list.innerHTML = '<div class="empty-state"><div class="icon">🔕</div><p>No active loans needing reminders</p></div>'
@@ -1083,18 +1214,7 @@ function loadReminders() {
       ? `Hey! Just a friendly reminder about the ${loan.amount} RLUSD I lent you via FaiVa. You owe ${loan.totalRepay} RLUSD (includes ${loan.feePercent}% fee). Due: ${dueStr}. Thanks! 🐑`
       : `Friendly reminder: you owe ${loan.totalRepay} RLUSD to your friend via FaiVa. Due: ${dueStr}. Let them know when you're ready to repay! 🐑`
 
-    return `
-      <div class="reminder-card">
-        <div class="reminder-text">${reminderText}</div>
-        <div class="reminder-actions">
-          <button class="btn btn-secondary btn-sm" onclick="copyReminder(this)">📋 Copy</button>
-          <button class="btn btn-secondary btn-sm" onclick="shareReminder('${encodeURIComponent(reminderText)}')">📤 Share</button>
-        </div>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">
-          ${isLender ? `To: ${borrower}` : `To: lender`} · ${daysLeft > 0 ? daysLeft + ' days remaining' : '⚠️ Past due'}
-        </div>
-      </div>
-    `
+    return `<div class="reminder-card"><div class="reminder-text">${reminderText}</div><div class="reminder-actions"><button class="btn btn-secondary btn-sm" onclick="copyReminder(this)">📋 Copy</button><button class="btn btn-secondary btn-sm" onclick="shareReminder('${encodeURIComponent(reminderText)}')">📤 Share</button></div><div style="font-size:11px;color:var(--text-dim);margin-top:8px;">${isLender ? `To: ${borrower}` : `To: lender`} · ${daysLeft > 0 ? daysLeft + ' days remaining' : '⚠️ Past due'}</div></div>`
   }).join('')
 }
 
@@ -1113,23 +1233,61 @@ function shareReminder(text) {
 }
 
 // ---- Init ----
-document.getElementById('seed-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') connectWallet()
+document.getElementById('seed-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') connectWallet?.()
 })
 
 const today = new Date()
 const minDate = new Date(today)
 minDate.setDate(minDate.getDate() + 1)
-document.getElementById('due-date-input').min = minDate.toISOString().split('T')[0]
-const maxDate = new Date(today)
-maxDate.setDate(maxDate.getDate() + 90)
-document.getElementById('due-date-input').max = maxDate.toISOString().split('T')[0]
-
-// Check if we came from an accept link
-const params = new URLSearchParams(window.location.search)
-if (params.get('loan')) {
-  // We'll handle this after wallet connection
+const dueInput = document.getElementById('due-date-input')
+if (dueInput) {
+  dueInput.min = minDate.toISOString().split('T')[0]
+  const maxDate = new Date(today)
+  maxDate.setDate(maxDate.getDate() + 90)
+  dueInput.max = maxDate.toISOString().split('T')[0]
 }
+
+// Auto-reconnect if there's a saved session
+window.addEventListener('load', async () => {
+  try {
+    const { default: UniversalProvider } = await import('@walletconnect/universal-provider')
+    wcProvider = await UniversalProvider.init({
+      projectId: JOEY_WC_PROJECT_ID,
+      metadata: { name: 'FaiVa', description: 'Friend-to-friend RLUSD lending', url: window.location.origin, icons: [] }
+    })
+
+    if (wcProvider.session) {
+      const addr = extractAddress(wcProvider.session)
+      if (addr) {
+        // Check BSP
+        const lines = await xrpl('account_lines', { account: addr, ledger_index: 'validated' })
+        const bspLine = lines.lines?.find(l => l.currency === 'BSP' && l.account === BSP_ISSUER)
+        const bspBal = bspLine ? parseFloat(bspLine.balance) : 0
+        if (bspBal > 0) {
+          wallet = { address: addr, bspBalance: bspBal, name: 'Joey' }
+          document.getElementById('wallet-bar').style.display = 'flex'
+          document.getElementById('wallet-addr').textContent = addr.slice(0, 8) + '...' + addr.slice(-6)
+          document.getElementById('wallet-bsp').textContent = bspBal.toFixed(2) + ' BSP'
+          const params = new URLSearchParams(window.location.search)
+          if (params.get('loan')) {
+            showAcceptScreen(params.get('loan'))
+          } else {
+            showScreen('create')
+          }
+          document.getElementById('bottom-nav').style.display = 'flex'
+          return
+        }
+      }
+    }
+
+    wcProvider.on('disconnect', () => {
+      if (wallet) { toast('Wallet disconnected'); disconnectWallet() }
+    })
+  } catch (err) {
+    console.log('[Init] No saved session')
+  }
+})
 </script>
 </body>
 </html>
