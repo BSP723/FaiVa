@@ -308,7 +308,38 @@ input[type="range"]::-moz-range-thumb {
   </div>
 
   <div id="error-banner" class="error-banner"></div>
+<script>
+    const XRPL_RPC = 'https://s.altnet.rippletest.net:51234/';
 
+    async function xrpl(method, params) {
+      const response = await fetch(XRPL_RPC, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: method, params: params || [] }),
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error_message || data.error);
+      }
+      return data.result;
+    }
+
+    async function testServerInfo() {
+      try {
+        const result = await xrpl('server_info', []);
+        console.log('Server info:', result);
+        alert('Check console for server info!');
+      } catch (error) {
+        console.error('Error fetching server info:', error);
+        alert('Error fetching server info. See console for details.');
+      }
+    }
+
+    // Call the function when the page loads
+    window.onload = () => {
+      testServerInfo();
+    };
+  </script>
   <!-- Connect Screen -->
   <div id="screen-connect" class="screen active">
     <div class="connect-screen">
