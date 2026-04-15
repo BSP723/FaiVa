@@ -422,6 +422,8 @@ let wallet = null
 let currentTab = 'active'
 
 // ---- XRPL RPC ----
+const XRPL_RPC = 'https://s.altnet.rippletest.net:51234/';
+
 async function xrpl(method, params) {
   const res = await fetch(XRPL_RPC, {
     method: 'POST',
