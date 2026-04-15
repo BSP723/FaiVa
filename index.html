@@ -5,36 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>FaiVa — The Friend Network</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-  <script>// Define the RPC URL for Ripple Testnet
-const XRPL_RPC = 'https://s.altnet.rippletest.net:51234/';
-
-// Define the xrpl function to make RPC calls
-async function xrpl(method, params) {
-  const response = await fetch(XRPL_RPC, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ method: method, params: params || [] }),
-  });
-  const data = await response.json();
-  if (data.error) {
-    throw new Error(data.error_message || data.error);
-  }
-  return data.result;
-}
-
-// Function to test server info
-async function testServerInfo() {
-  try {
-    const result = await xrpl('server_info', []);
-    console.log('Server info:', result);
-  } catch (error) {
-    console.error('Error fetching server info:', error);
-  }
-}
-
-// Run the test
-testServerInfo();
-  </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
